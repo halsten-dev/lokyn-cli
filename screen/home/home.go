@@ -1,6 +1,7 @@
 package home
 
 import (
+	"fmt"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/halsten-dev/lokyn"
 	"lokyn-cli/engine"
@@ -9,21 +10,27 @@ import (
 )
 
 type Screen struct {
+	title *orvyn.SimpleRenderable
+
 	layout *layout.CenterLayout
 }
 
 func New() *Screen {
 	s := new(Screen)
 
+	s.title = orvyn.NewSimpleRenderable(lokyn.L("home"))
+
 	s.layout = layout.NewCenterLayout(
-		orvyn.NewSimpleRenderable(lokyn.L("home")),
+		s.title,
 	)
 
 	return s
 }
 
 func (s *Screen) OnEnter(i interface{}) tea.Cmd {
-	engine.DiscoverKeys()
+	keys := engine.DiscoverKeys()
+
+	s.title.SetValue(fmt.Sprintf("Found keys count : %d", len(keys)))
 
 	return nil
 }
