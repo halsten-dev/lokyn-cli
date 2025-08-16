@@ -3,8 +3,11 @@ package main
 import (
 	"embed"
 	"log"
+	"lokyn-cli/internal/config"
 	"lokyn-cli/internal/keybind"
 	"lokyn-cli/internal/orvyn"
+	"lokyn-cli/screen"
+	"lokyn-cli/screen/home"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/halsten-dev/bubblehelp"
@@ -22,6 +25,8 @@ func main() {
 		log.Fatal(err)
 	}
 	defer f.Close()
+
+	config.Init()
 
 	lokyn.Init()
 	err = lokyn.AddTranslationFS(translations, "translations")
@@ -41,9 +46,10 @@ func main() {
 	// Orvyn
 	orvyn.Init()
 
-	// orvyn.RegisterScreen(screen.IDLogin, login.New())
+	orvyn.RegisterScreen(screen.IDHome, home.New())
 	// orvyn.RegisterScreen(screen.IDCharacterSelection, characterselection.New())
-	// orvyn.SwitchScreen(screen.IDLogin)
+
+	orvyn.SwitchScreen(screen.IDHome)
 
 	p := tea.NewProgram(&App{}, tea.WithAltScreen())
 

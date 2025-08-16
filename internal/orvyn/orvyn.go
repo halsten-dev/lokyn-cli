@@ -2,11 +2,18 @@
 package orvyn
 
 import (
+	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
 	"log"
 )
 
 var (
+	// ExitKeybind to manage global exit
+	ExitKeybind key.Binding
+
+	// ProcessExit determines if orvyn should manage the global exit keybind.
+	ProcessExit bool
+
 	// WindowSize hold the size of the Window.
 	WindowSize Size
 
@@ -23,12 +30,21 @@ var (
 )
 
 func Init() {
+	ExitKeybind = key.NewBinding(key.WithKeys("ctrl+c"))
+	ProcessExit = true
 	WindowSize = NewSize(0, 0)
 	screens = make(map[ScreenID]Screen)
 }
 
 func Update(msg tea.Msg) tea.Cmd {
 	switch msg := msg.(type) {
+	case tea.KeyMsg:
+		switch {
+		case key.Matches(msg, ExitKeybind):
+			if ProcessExit {
+				return tea.Quit
+			}
+		}
 	case tea.WindowSizeMsg:
 		WindowSize.Width = msg.Width
 		WindowSize.Height = msg.Height
@@ -38,7 +54,6 @@ func Update(msg tea.Msg) tea.Cmd {
 		return nil
 	}
 
-	// TODO: If a dialog is active, update it and not the current screen.
 	if activeDialog != nil {
 		return activeDialog.screen.Update(msg)
 	} else {
@@ -54,7 +69,6 @@ func Render() string {
 		return "Orvyn : No Current Screen"
 	}
 
-	// TODO: If a dialog is active, render it and not the current screen.
 	if activeDialog != nil {
 		layout = activeDialog.screen.Render()
 	} else {
