@@ -8,6 +8,11 @@ import (
 	"path/filepath"
 )
 
+const (
+	LANGUAGE      string = "language"
+	DEEPL_API_KEY string = "deeplapikey"
+)
+
 func Init() {
 	var configPath string
 	var err error
@@ -27,7 +32,8 @@ func Init() {
 	}
 
 	// Set defaults
-	viper.SetDefault("language", "en")
+	viper.SetDefault(LANGUAGE, "en")
+	viper.SetDefault(DEEPL_API_KEY, "")
 
 	viper.SetConfigName("lokyn")
 	viper.SetConfigType("toml")

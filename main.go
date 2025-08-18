@@ -6,8 +6,10 @@ import (
 	"lokyn-cli/internal/config"
 	"lokyn-cli/internal/keybind"
 	"lokyn-cli/internal/orvyn"
+	"lokyn-cli/internal/translate"
 	"lokyn-cli/screen"
 	"lokyn-cli/screen/home"
+	"lokyn-cli/screen/projectloading"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/halsten-dev/bubblehelp"
@@ -28,6 +30,8 @@ func main() {
 
 	config.Init()
 
+	translate.Init(viper.GetString(config.DEEPL_API_KEY))
+
 	lokyn.Init()
 	err = lokyn.AddTranslationFS(translations, "translations")
 
@@ -46,10 +50,10 @@ func main() {
 	// Orvyn
 	orvyn.Init()
 
+	orvyn.RegisterScreen(screen.IDProjectLoading, projectloading.New())
 	orvyn.RegisterScreen(screen.IDHome, home.New())
-	// orvyn.RegisterScreen(screen.IDCharacterSelection, characterselection.New())
 
-	orvyn.SwitchScreen(screen.IDHome)
+	orvyn.SwitchScreen(screen.IDProjectLoading)
 
 	p := tea.NewProgram(&App{}, tea.WithAltScreen())
 

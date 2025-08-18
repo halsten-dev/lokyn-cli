@@ -2,11 +2,12 @@ package home
 
 import (
 	"fmt"
-	tea "github.com/charmbracelet/bubbletea"
-	"github.com/halsten-dev/lokyn"
 	"lokyn-cli/engine"
 	"lokyn-cli/internal/layout"
 	"lokyn-cli/internal/orvyn"
+
+	tea "github.com/charmbracelet/bubbletea"
+	"github.com/halsten-dev/lokyn"
 )
 
 type Screen struct {
@@ -28,7 +29,11 @@ func New() *Screen {
 }
 
 func (s *Screen) OnEnter(i interface{}) tea.Cmd {
-	keys := engine.DiscoverKeys()
+	keys, err := engine.DiscoverKeys()
+
+	if err != nil {
+		panic(err)
+	}
 
 	s.title.SetValue(fmt.Sprintf("Found keys count : %d", len(keys)))
 

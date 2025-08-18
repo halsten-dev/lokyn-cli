@@ -75,6 +75,10 @@ func Render() string {
 		layout = screens[currentScreenID].Render()
 	}
 
+	if layout == nil {
+		return ""
+	}
+
 	layout.Resize(WindowSize)
 	return layout.Render()
 }

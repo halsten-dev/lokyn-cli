@@ -1,6 +1,11 @@
 // Package engine contains all the processing logic for the application.
 package engine
 
+const (
+	PROJECT_DIR_NAME  string = ".lokyn"
+	PROJECT_FILE_NAME string = "lokynproj.json"
+)
+
 type Keys []Key
 
 type Key struct {
@@ -13,6 +18,12 @@ type Key struct {
 	// err will hold the error message if the key was invalid for example.
 	// Useful to report problems to the user.
 	err error
+}
+
+type Project struct {
+	exportDir        string
+	managedLanguages []string
+	translationMaps  []TranslationMap
 }
 
 type TranslationMap struct {
