@@ -6,7 +6,7 @@ import (
 )
 
 func projectSave(p *Project, filePath string) error {
-	content, err := json.Marshal(p)
+	content, err := json.Marshal(*p)
 
 	if err != nil {
 		return err

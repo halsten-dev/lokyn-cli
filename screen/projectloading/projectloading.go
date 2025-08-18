@@ -1,19 +1,24 @@
 package projectloading
 
 import (
+	"errors"
 	"fmt"
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/halsten-dev/bubblehelp"
+	"github.com/halsten-dev/lokyn"
 	"lokyn-cli/engine"
 	"lokyn-cli/internal/keybind"
 	"lokyn-cli/internal/layout"
 	"lokyn-cli/internal/orvyn"
+	"lokyn-cli/screen"
 	"lokyn-cli/screen/dialog/popup"
 	"lokyn-cli/widget/help"
 	"lokyn-cli/widget/label"
+	"lokyn-cli/widget/statusmessage"
 	"lokyn-cli/widget/textinput"
 	"os"
+	"strings"
 )
 
 var (
@@ -23,16 +28,33 @@ var (
 type Screen struct {
 	project engine.Project
 
-	label     *label.Widget
-	languages *textinput.Widget
+	labelExportPath *label.Widget
+	exportPath      *textinput.Widget
+
+	labelLanguages *label.Widget
+	languages      *textinput.Widget
 
 	help *help.Widget
 
+	statusMessage *statusmessage.Widget
+
+	focusManager *orvyn.FocusManager
+
 	layout *layout.CenterLayout
+
+	currentDir string
 }
 
 func New() *Screen {
+	var err error
+
 	s := new(Screen)
+
+	s.currentDir, err = os.Getwd()
+
+	if err != nil {
+		panic(err)
+	}
 
 	keymapContext.NewKeyBinding(keybind.Enter, true)
 	keymapContext.SetHelpDesc(keybind.Enter, "create project")
@@ -41,16 +63,31 @@ func New() *Screen {
 
 	bubblehelp.RegisterContext(keybind.ContextProjectLoading, keymapContext)
 
-	s.label = label.New("wanted languages (separated by a coma)")
+	s.labelExportPath = label.New(
+		fmt.Sprintf("translation export path (relative to %s)", s.currentDir))
+	s.exportPath = textinput.New()
+
+	s.labelLanguages = label.New("wanted languages (separated by a coma)")
 	s.languages = textinput.New()
-	s.languages.Focus()
+
 	s.help = help.New()
+
+	s.statusMessage = statusmessage.New()
+
+	s.focusManager = orvyn.NewFocusManager()
+	s.focusManager.Add(s.exportPath)
+	s.focusManager.Add(s.languages)
 
 	s.layout = layout.NewCenterLayout(
 		layout.NewDefinedWidthVerticalLayout(30, 100, 10,
 			[]orvyn.Renderable{
-				s.label,
+				s.labelExportPath,
+				s.exportPath,
+				orvyn.VGap,
+				s.labelLanguages,
 				s.languages,
+				orvyn.VGap,
+				s.statusMessage,
 				s.help,
 			},
 		),
@@ -61,39 +98,28 @@ func New() *Screen {
 
 func (s *Screen) OnEnter(i interface{}) tea.Cmd {
 	var err error
-	var projectFound bool
 
 	bubblehelp.SwitchContext(keybind.ContextProjectLoading)
 
-	projectFound = false
-
-	// Is there a valid Lokyn project on the current directory ?
 	s.project, err = engine.DiscoverProject()
 
 	if err != nil {
 		s.project = engine.Project{}
 	} else {
-		projectFound = true
+		return orvyn.SwitchScreen(screen.IDHome)
 	}
 
-	// Ask for project creation or exit
-	if !projectFound {
-		currentDir, err := os.Getwd()
+	orvyn.OpenDialog("AskProjectCreation", popup.NewYesNo(
+		fmt.Sprintf("Do you want to create a lokyn project in : %s",
+			s.currentDir)), nil)
 
-		if err != nil {
-			panic(err)
-		}
+	s.focusManager.Focus(0)
 
-		orvyn.OpenDialog("AskProjectCreation", popup.NewYesNo(
-			fmt.Sprintf("Do you want to create a lokyn project in : %s",
-				currentDir)), nil)
-	}
-
-	return s.languages.Init()
+	return s.exportPath.Init()
 }
 
 func (s *Screen) OnExit() interface{} {
-	return nil
+	return s.project
 }
 
 func (s *Screen) Update(msg tea.Msg) tea.Cmd {
@@ -101,8 +127,9 @@ func (s *Screen) Update(msg tea.Msg) tea.Cmd {
 	case tea.KeyMsg:
 		switch {
 		case key.Matches(msg, keybind.Enter):
-			// Validate
-			return nil
+			if s.projectCreation() {
+				return orvyn.SwitchScreen(screen.IDHome)
+			}
 
 		case key.Matches(msg, keybind.Esc):
 			return tea.Quit
@@ -115,18 +142,50 @@ func (s *Screen) Update(msg tea.Msg) tea.Cmd {
 
 			switch val {
 			case 1:
-				return s.languages.Init()
+				// For blinking cursor
+				return s.exportPath.Init()
 			default:
 				return tea.Quit
 			}
 		}
 	}
 
-	cmd := s.languages.Update(msg)
+	cmd := s.focusManager.Update(msg)
 
 	return cmd
 }
 
 func (s *Screen) Render() orvyn.Layout {
 	return s.layout
+}
+
+func (s *Screen) projectCreation() bool {
+	var exportPath string
+	var languages []string
+
+	exportPath = s.exportPath.Value()
+
+	if len(exportPath) == 0 {
+		s.statusMessage.SetError(errors.New(lokyn.L("Translation export path is mandatory")))
+		return false
+	}
+
+	languages = strings.Split(
+		strings.TrimSpace(s.languages.Value()), ",")
+
+	if len(languages[0]) == 0 {
+		s.statusMessage.SetError(errors.New(lokyn.L("Languages list is mandatory")))
+		return false
+	}
+
+	s.project = engine.ProjectNew(exportPath, languages)
+
+	err := engine.ProjectSave(&s.project)
+
+	if err != nil {
+		s.statusMessage.SetError(err)
+		return false
+	}
+
+	return true
 }

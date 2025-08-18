@@ -9,3 +9,13 @@ debug 2025/08/18 19:03:36 program was killed: program experienced a panic
 debug 2025/08/18 19:05:28 program was killed: program experienced a panic
 debug 2025/08/18 19:29:16 could not open a new TTY: open /dev/tty: no such device or address
 debug 2025/08/18 19:30:02 program was killed: program experienced a panic
+debug 2025/08/18 21:17:03 could not open a new TTY: open /dev/tty: no such device or address
+debug 2025/08/18 21:17:16 could not open a new TTY: open /dev/tty: no such device or address
+debug 2025/08/18 21:17:58 could not open a new TTY: open /dev/tty: no such device or address
+debug 2025/08/18 21:18:06 could not open a new TTY: open /dev/tty: no such device or address
+debug 2025/08/18 21:18:14 could not open a new TTY: open /dev/tty: no such device or address
+debug 2025/08/18 21:18:51 program was killed: program was interrupted
+debug 2025/08/18 21:19:44 program was killed: program was interrupted
+debug 2025/08/18 21:26:43 program was killed: program was interrupted
+debug 2025/08/18 21:28:01 program was killed: program was interrupted
+debug 2025/08/18 21:28:13 program was killed: program was interrupted
