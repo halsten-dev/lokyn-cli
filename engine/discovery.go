@@ -121,7 +121,7 @@ func findCalls(keys *Keys, content []byte, prefix string) {
 			isPlural: callType == "P",
 		}
 
-		if strings.HasPrefix(callKey, `"`) && strings.HasSuffix(callKey, `"`) {
+		if isSurroundedBy(callKey, `"`) || isSurroundedBy(callKey, "`") {
 			key.key = callKey[1 : len(callKey)-1]
 			key.err = nil
 		} else {
@@ -131,4 +131,12 @@ func findCalls(keys *Keys, content []byte, prefix string) {
 
 		*keys = append(*keys, key)
 	}
+}
+
+func isSurroundedBy(value string, character string) bool {
+	if strings.HasPrefix(value, character) && strings.HasSuffix(value, character) {
+		return true
+	}
+
+	return false
 }
