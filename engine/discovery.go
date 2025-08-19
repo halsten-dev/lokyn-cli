@@ -154,17 +154,17 @@ func findCalls(keys *Keys, content []byte, prefix string) {
 		callKey := string(match[2])
 		callKey = strings.TrimSpace(callKey)
 
-		key := Key{
-			key:      callKey,
-			isPlural: callType == "P",
+		key := DiscoveredKey{
+			Key:      callKey,
+			IsPlural: callType == "P",
 		}
 
 		if isSurroundedBy(callKey, `"`) || isSurroundedBy(callKey, "`") {
-			key.key = callKey[1 : len(callKey)-1]
-			key.err = nil
+			key.Key = callKey[1 : len(callKey)-1]
+			key.Err = nil
 		} else {
-			key.key = callKey
-			key.err = errors.New("key is variable, need manual matching")
+			key.Key = callKey
+			key.Err = errors.New("Key is variable, need manual matching")
 		}
 
 		*keys = append(*keys, key)

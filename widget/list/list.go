@@ -4,12 +4,13 @@ import (
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
 	"lokyn-cli/internal/orvyn"
-	"lokyn-cli/style"
+	"lokyn-cli/internal/style"
 )
 
 // Widget is a very simple list without filter or any feature.
 type Widget struct {
 	orvyn.BaseWidget
+	orvyn.BaseFocusable
 
 	list.Model
 
@@ -68,3 +69,11 @@ func (w *Widget) GetMinSize() orvyn.Size {
 func (w *Widget) GetPreferredSize() orvyn.Size {
 	return w.PreferredSize
 }
+
+func (w *Widget) OnFocus() {}
+
+func (w *Widget) OnBlur() {}
+
+func (w *Widget) OnEnterInput() {}
+
+func (w *Widget) OnExitInput() {}

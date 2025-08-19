@@ -31,16 +31,16 @@ func DiscoverKeys() (Keys, error) {
 func ProjectNew(exportPath string, languages []string) Project {
 	project := Project{}
 
-	project.exportDir = exportPath
-	project.managedLanguages = languages
+	project.ExportDir = exportPath
+	project.ManagedLanguages = languages
 
 	for _, l := range languages {
 		transMap := TranslationMap{
-			language: l,
-			keys:     make([]TranslationKey, 0),
+			Language: l,
+			Keys:     make([]TranslationKey, 0),
 		}
 
-		project.translationMaps = append(project.translationMaps, transMap)
+		project.TranslationMaps = append(project.TranslationMaps, transMap)
 	}
 
 	return project

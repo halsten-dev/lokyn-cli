@@ -6,34 +6,34 @@ const (
 	PROJECT_FILE_NAME string = "lokynproj.json"
 )
 
-type Keys []Key
+type Keys []DiscoveredKey
 
-type Key struct {
+type DiscoveredKey struct {
 	// key holds the key found in source files of the project.
-	key string
+	Key string
 
 	// isPlural holds the fact that the key was used as a plural key.
-	isPlural bool
+	IsPlural bool
 
 	// err will hold the error message if the key was invalid for example.
 	// Useful to report problems to the user.
-	err error
+	Err error
 }
 
 type Project struct {
-	exportDir        string
-	managedLanguages []string
-	translationMaps  []TranslationMap
+	ExportDir        string
+	ManagedLanguages []string
+	TranslationMaps  []TranslationMap
 }
 
 type TranslationMap struct {
-	language string
-	keys     []TranslationKey
+	Language string
+	Keys     []TranslationKey
 }
 
 type TranslationKey struct {
-	key        string
-	isPlural   bool
-	oneValue   string
-	otherValue string
+	Key        string
+	IsPlural   bool
+	OneValue   string
+	OtherValue string
 }
