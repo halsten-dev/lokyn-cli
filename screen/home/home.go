@@ -2,19 +2,19 @@ package home
 
 import (
 	"errors"
-	tealist "github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/halsten-dev/lokyn"
 	"lokyn-cli/engine"
 	"lokyn-cli/internal/layout"
 	"lokyn-cli/internal/orvyn"
-	"lokyn-cli/widget/list"
+	"lokyn-cli/internal/orvyn/widget/list"
+	"lokyn-cli/widget/keylistitem"
 )
 
 type Screen struct {
 	title *orvyn.SimpleRenderable
 
-	keyList *list.Widget
+	keyList *list.Widget[engine.DiscoveredKey]
 
 	focusManager *orvyn.FocusManager
 
@@ -30,7 +30,7 @@ func New() *Screen {
 	s.title = orvyn.NewSimpleRenderable(lokyn.L("home"))
 	s.title.SizeConstraint = true
 
-	s.keyList = list.New(KeyListItemDelegate{}, []tealist.Item{})
+	s.keyList = list.New[engine.DiscoveredKey](keylistitem.Constructor)
 
 	s.focusManager = orvyn.NewFocusManager()
 	s.focusManager.Add(s.keyList)
@@ -89,17 +89,5 @@ func (s *Screen) Render() orvyn.Layout {
 }
 
 func (s *Screen) updateKeyList() {
-	var listItems []tealist.Item
-
-	listItems = make([]tealist.Item, 0)
-
-	for _, k := range s.keys {
-		item := KeyListItem{
-			DiscoveredKey: k,
-		}
-
-		listItems = append(listItems, item)
-	}
-
-	s.keyList.SetItems(listItems)
+	s.keyList.SetItems(s.keys)
 }
