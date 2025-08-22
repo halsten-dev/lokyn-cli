@@ -28,7 +28,7 @@ func Constructor(data engine.DiscoveredKey) list.IListItem {
 
 func (w *Widget) Resize(size orvyn.Size) {
 	size.Width -= style.BlurredStyle.GetHorizontalFrameSize()
-	size.Height = 3
+	size.Height = lipgloss.Height(style.BlurredStyle.Render(string(w.data.Key)))
 
 	w.BaseWidget.Resize(size)
 }
@@ -38,7 +38,7 @@ func (w *Widget) Render() string {
 
 	return w.style.
 		Width(size.Width).
-		Render(w.data.Key)
+		Render(string(w.data.Key))
 }
 
 func (w *Widget) OnFocus() {

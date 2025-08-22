@@ -34,6 +34,8 @@ type LangKeyMap map[Lang]map[Key]Translation
 type KeyLangMap map[Key]map[Lang]Translation
 
 type Translation struct {
+	Key        Key
+	Lang       Lang
 	OneValue   string
 	OtherValue string
 	IsPlural   bool

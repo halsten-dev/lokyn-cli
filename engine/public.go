@@ -28,11 +28,17 @@ func DiscoverKeys() (Keys, error) {
 }
 
 // ProjectNew creates a new project and returns it
-func ProjectNew(exportPath string, languages []Lang) Project {
+func ProjectNew(exportPath string, languages []string) Project {
+	langs := make([]Lang, len(languages))
+
 	project := Project{}
 
+	for i, l := range languages {
+		langs[i] = Lang(l)
+	}
+
 	project.ExportDir = exportPath
-	project.ManagedLanguages = languages
+	project.ManagedLanguages = langs
 
 	return project
 }

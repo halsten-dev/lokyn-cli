@@ -54,7 +54,7 @@ func discoverProject(project *Project, directory string) error {
 	if !projectFileFound {
 		return errors.New(ERROR_NO_PROJECT_FOUND)
 	}
-	
+
 	return nil
 }
 
@@ -155,15 +155,15 @@ func findCalls(keys *Keys, content []byte, prefix string) {
 		callKey = strings.TrimSpace(callKey)
 
 		key := DiscoveredKey{
-			Key:      callKey,
+			Key:      Key(callKey),
 			IsPlural: callType == "P",
 		}
 
 		if isSurroundedBy(callKey, `"`) || isSurroundedBy(callKey, "`") {
-			key.Key = callKey[1 : len(callKey)-1]
+			key.Key = Key(callKey[1 : len(callKey)-1])
 			key.Err = nil
 		} else {
-			key.Key = callKey
+			key.Key = Key(callKey)
 			key.Err = errors.New("Key is variable, need manual matching")
 		}
 

@@ -25,7 +25,8 @@ type Widget[T any] struct {
 	orvyn.BaseWidget
 	orvyn.BaseFocusable
 
-	InfiniteScroll bool
+	InfiniteScroll      bool
+	CursorMovedCallback func(int)
 
 	cursor      int
 	globalIndex int
@@ -73,9 +74,16 @@ func (w *Widget[T]) Update(msg tea.Msg) tea.Cmd {
 		case key.Matches(msg, w.focusManager.PreviousFocusKeybind):
 			w.PreviousItem()
 
+			if w.CursorMovedCallback != nil {
+				w.CursorMovedCallback(w.globalIndex)
+			}
+
 		case key.Matches(msg, w.focusManager.NextFocusKeybind):
 			w.NextItem()
 
+			if w.CursorMovedCallback != nil {
+				w.CursorMovedCallback(w.globalIndex)
+			}
 		}
 	}
 
