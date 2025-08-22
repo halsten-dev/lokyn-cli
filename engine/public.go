@@ -28,20 +28,11 @@ func DiscoverKeys() (Keys, error) {
 }
 
 // ProjectNew creates a new project and returns it
-func ProjectNew(exportPath string, languages []string) Project {
+func ProjectNew(exportPath string, languages []Lang) Project {
 	project := Project{}
 
 	project.ExportDir = exportPath
 	project.ManagedLanguages = languages
-
-	for _, l := range languages {
-		transMap := TranslationMap{
-			Language: l,
-			Keys:     make([]TranslationKey, 0),
-		}
-
-		project.TranslationMaps = append(project.TranslationMaps, transMap)
-	}
 
 	return project
 }

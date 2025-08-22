@@ -6,34 +6,48 @@ const (
 	PROJECT_FILE_NAME string = "lokynproj.json"
 )
 
+type Key string
+type Lang string
+
 type Keys []DiscoveredKey
 
 type DiscoveredKey struct {
-	// key holds the key found in source files of the project.
-	Key string
+	// Key holds the key found in source files of the project.
+	Key Key
 
-	// isPlural holds the fact that the key was used as a plural key.
-	IsPlural bool
-
-	// err will hold the error message if the key was invalid for example.
+	// Err will hold the error message if the key was invalid for example.
 	// Useful to report problems to the user.
 	Err error
+
+	// IsPlural holds the fact that the key was used as a plural key.
+	IsPlural bool
 }
 
 type Project struct {
-	ExportDir        string
-	ManagedLanguages []string
-	TranslationMaps  []TranslationMap
+	ExportDir string
+	// MainLanguage     Lang
+	ManagedLanguages []Lang
 }
 
-type TranslationMap struct {
-	Language string
-	Keys     []TranslationKey
-}
+type LangKeyMap map[Lang]map[Key]Translation
 
-type TranslationKey struct {
-	Key        string
-	IsPlural   bool
+type KeyLangMap map[Key]map[Lang]Translation
+
+type Translation struct {
 	OneValue   string
 	OtherValue string
+	IsPlural   bool
 }
+
+type T struct {
+	ID string
+	Value string
+}
+type IT interface {
+	GetValue() string
+
+}
+
+t := NewT() // me renvoie l'interface IT
+t.(*T).ID // pour chopper l'ID
+t.GetValue() // pour chopper la value
