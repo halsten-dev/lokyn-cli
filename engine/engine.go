@@ -38,16 +38,3 @@ type Translation struct {
 	OtherValue string
 	IsPlural   bool
 }
-
-type T struct {
-	ID string
-	Value string
-}
-type IT interface {
-	GetValue() string
-
-}
-
-t := NewT() // me renvoie l'interface IT
-t.(*T).ID // pour chopper l'ID
-t.GetValue() // pour chopper la value
