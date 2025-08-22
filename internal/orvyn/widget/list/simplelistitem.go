@@ -1,9 +1,9 @@
-package widget
+package list
 
 import (
-	"farental/internal/orvyn"
-	"farental/style"
 	"github.com/charmbracelet/lipgloss"
+	"lokyn-cli/internal/orvyn"
+	"lokyn-cli/internal/style"
 )
 
 type SimpleListItem struct {

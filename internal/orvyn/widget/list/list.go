@@ -1,12 +1,12 @@
-package widget
+package list
 
 import (
-	"farental/internal/orvyn"
-	"farental/style"
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/paginator"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"lokyn-cli/internal/orvyn"
+	"lokyn-cli/internal/style"
 	"strings"
 )
 
