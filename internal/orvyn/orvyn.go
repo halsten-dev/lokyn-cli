@@ -32,7 +32,7 @@ var (
 func Init() {
 	ExitKeybind = key.NewBinding(key.WithKeys("ctrl+c"))
 	ProcessExit = true
-	WindowSize = NewSize(0, 0)
+	WindowSize = NewSize(100, 100)
 	screens = make(map[ScreenID]Screen)
 }
 
@@ -45,6 +45,7 @@ func Update(msg tea.Msg) tea.Cmd {
 				return tea.Quit
 			}
 		}
+
 	case tea.WindowSizeMsg:
 		WindowSize.Width = msg.Width
 		WindowSize.Height = msg.Height

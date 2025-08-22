@@ -16,8 +16,11 @@ type FocusManager struct {
 	// Shift+Tab by default.
 	PreviousFocusKeybind key.Binding
 
-	widgets  []Focusable
-	tabIndex int
+	widgets     []Focusable
+	tabIndex    int
+	isInputting bool
+
+	ManageFocusNextPrevKeybind bool
 }
 
 // NewFocusManager creates and return a new *FocusManager
@@ -26,6 +29,7 @@ func NewFocusManager() *FocusManager {
 
 	f.widgets = make([]Focusable, 0)
 	f.tabIndex = 0
+	f.isInputting = false
 
 	f.NextFocusKeybind = key.NewBinding(
 		key.WithKeys("tab"),
@@ -35,6 +39,8 @@ func NewFocusManager() *FocusManager {
 		key.WithKeys("shift+tab"),
 		key.WithHelp("shift+tab", "previous focus"),
 	)
+
+	f.ManageFocusNextPrevKeybind = true
 
 	return f
 }
@@ -96,6 +102,32 @@ func (f *FocusManager) ExitCurrentInput() {
 	}
 }
 
+// IsInputting returns true if a widget is in inputting mode.
+func (f *FocusManager) IsInputting() bool {
+	return f.isInputting
+}
+
+func (f *FocusManager) PrevFocus() {
+	if f.widgets[f.tabIndex].IsFocused() {
+		f.blur(f.tabIndex)
+	}
+
+	f.tabIndex = f.getPreviousIndex()
+
+	f.focus(f.tabIndex)
+}
+
+func (f *FocusManager) NextFocus() {
+	if f.widgets[f.tabIndex].IsFocused() {
+		f.blur(f.tabIndex)
+	}
+
+	f.tabIndex = f.getNextIndex()
+
+	f.focus(f.tabIndex)
+
+}
+
 func (f *FocusManager) Update(msg tea.Msg) tea.Cmd {
 	var cmd tea.Cmd
 
@@ -123,26 +155,16 @@ func (f *FocusManager) Update(msg tea.Msg) tea.Cmd {
 	case tea.KeyMsg:
 		switch {
 		case key.Matches(msg, f.NextFocusKeybind):
-			if f.widgets[f.tabIndex].IsFocused() {
-				f.blur(f.tabIndex)
+			if f.ManageFocusNextPrevKeybind {
+				f.NextFocus()
+				return nil
 			}
-
-			f.tabIndex = f.getNextIndex()
-
-			f.focus(f.tabIndex)
-
-			return nil
 
 		case key.Matches(msg, f.PreviousFocusKeybind):
-			if f.widgets[f.tabIndex].IsFocused() {
-				f.blur(f.tabIndex)
+			if f.ManageFocusNextPrevKeybind {
+				f.PrevFocus()
+				return nil
 			}
-
-			f.tabIndex = f.getPreviousIndex()
-
-			f.focus(f.tabIndex)
-
-			return nil
 		}
 
 		inputtingKeybind := f.widgets[f.tabIndex].GetEnterInputKeybind()
@@ -203,12 +225,14 @@ func (f *FocusManager) blur(index int) {
 func (f *FocusManager) enterInput(index int) {
 	f.widgets[index].setInputting(true)
 	f.widgets[index].OnEnterInput()
+	f.isInputting = true
 }
 
 // exitInput is a shorthand to manage the inputting state and call OnExitInput.
 func (f *FocusManager) exitInput(index int) {
 	f.widgets[index].setInputting(false)
 	f.widgets[index].OnExitInput()
+	f.isInputting = false
 }
 
 func (f *FocusManager) getNextIndex() int {
