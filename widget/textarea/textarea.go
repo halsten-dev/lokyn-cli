@@ -4,7 +4,7 @@ import (
 	"github.com/charmbracelet/bubbles/textarea"
 	tea "github.com/charmbracelet/bubbletea"
 	"lokyn-cli/internal/orvyn"
-	"lokyn-cli/style"
+	"lokyn-cli/internal/style"
 )
 
 type Widget struct {
