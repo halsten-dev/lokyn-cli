@@ -3,7 +3,7 @@ package list
 import (
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
-	"lokyn-cli/internal/orvyn"
+	"github.com/halsten-dev/orvyn"
 	"lokyn-cli/internal/style"
 )
 

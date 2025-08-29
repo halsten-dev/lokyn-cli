@@ -1,7 +1,7 @@
 package screen
 
 import (
-	"lokyn-cli/internal/orvyn"
+	"github.com/halsten-dev/orvyn"
 )
 
 const (

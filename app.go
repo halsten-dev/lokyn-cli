@@ -1,7 +1,7 @@
 package main
 
 import (
-	"lokyn-cli/internal/orvyn"
+	"github.com/halsten-dev/orvyn"
 
 	tea "github.com/charmbracelet/bubbletea"
 )

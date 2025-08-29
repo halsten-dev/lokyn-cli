@@ -3,7 +3,7 @@ package help
 import (
 	"github.com/charmbracelet/lipgloss"
 	"github.com/halsten-dev/bubblehelp"
-	"lokyn-cli/internal/orvyn"
+	"github.com/halsten-dev/orvyn"
 )
 
 type Widget struct {

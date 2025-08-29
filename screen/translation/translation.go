@@ -4,10 +4,10 @@ import (
 	"errors"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/halsten-dev/lokyn"
+	"github.com/halsten-dev/orvyn"
+	"github.com/halsten-dev/orvyn/widget/list"
 	"lokyn-cli/engine"
 	"lokyn-cli/internal/layout"
-	"lokyn-cli/internal/orvyn"
-	"lokyn-cli/internal/orvyn/widget/list"
 	"lokyn-cli/widget/keyedit"
 	"lokyn-cli/widget/keylistitem"
 )

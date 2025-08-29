@@ -2,7 +2,7 @@ package label
 
 import (
 	"github.com/charmbracelet/lipgloss"
-	"lokyn-cli/internal/orvyn"
+	"github.com/halsten-dev/orvyn"
 )
 
 type Widget struct {

@@ -1,7 +1,7 @@
 package textinput
 
 import (
-	"lokyn-cli/internal/orvyn"
+	"github.com/halsten-dev/orvyn"
 	"lokyn-cli/internal/style"
 
 	"github.com/charmbracelet/bubbles/textinput"

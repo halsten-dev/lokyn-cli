@@ -1,7 +1,7 @@
 package layout
 
 import (
-	"lokyn-cli/internal/orvyn"
+	"github.com/halsten-dev/orvyn"
 )
 
 // PileLayout Show only the first visible widget in the full size available.

@@ -2,8 +2,8 @@ package layout
 
 import (
 	"github.com/charmbracelet/lipgloss"
+	"github.com/halsten-dev/orvyn"
 	"log"
-	"lokyn-cli/internal/orvyn"
 	"math"
 	"strings"
 )

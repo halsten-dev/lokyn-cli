@@ -3,7 +3,7 @@ package textarea
 import (
 	"github.com/charmbracelet/bubbles/textarea"
 	tea "github.com/charmbracelet/bubbletea"
-	"lokyn-cli/internal/orvyn"
+	"github.com/halsten-dev/orvyn"
 	"lokyn-cli/internal/style"
 )
 

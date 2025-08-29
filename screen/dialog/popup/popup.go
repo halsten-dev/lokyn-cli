@@ -6,9 +6,9 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/halsten-dev/lokyn"
+	"github.com/halsten-dev/orvyn"
 	"lokyn-cli/internal/keybind"
 	"lokyn-cli/internal/layout"
-	"lokyn-cli/internal/orvyn"
 	"lokyn-cli/internal/style"
 	"strings"
 )

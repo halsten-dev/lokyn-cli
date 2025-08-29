@@ -2,7 +2,7 @@ package layout
 
 import (
 	"github.com/charmbracelet/lipgloss"
-	"lokyn-cli/internal/orvyn"
+	"github.com/halsten-dev/orvyn"
 )
 
 // CenterLayout centers the given element in the available size.

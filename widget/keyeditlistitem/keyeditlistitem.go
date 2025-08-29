@@ -2,10 +2,10 @@ package keyeditlistitem
 
 import (
 	"github.com/charmbracelet/lipgloss"
+	"github.com/halsten-dev/orvyn"
+	"github.com/halsten-dev/orvyn/widget/list"
 	"lokyn-cli/engine"
 	"lokyn-cli/internal/layout"
-	"lokyn-cli/internal/orvyn"
-	"lokyn-cli/internal/orvyn/widget/list"
 	"lokyn-cli/internal/style"
 	"lokyn-cli/widget/textinput"
 )

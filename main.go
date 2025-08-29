@@ -2,10 +2,10 @@ package main
 
 import (
 	"embed"
+	"github.com/halsten-dev/orvyn"
 	"log"
 	"lokyn-cli/internal/config"
 	"lokyn-cli/internal/keybind"
-	"lokyn-cli/internal/orvyn"
 	"lokyn-cli/internal/translate"
 	"lokyn-cli/screen"
 	"lokyn-cli/screen/home"
