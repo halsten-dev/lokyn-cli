@@ -24,7 +24,7 @@ func New() *Widget {
 
 	w.BaseWidget = orvyn.NewBaseWidget()
 
-	w.translationFieldsList = list.New[engine.Translation](keyeditlistitem.Constructor)
+	w.translationFieldsList = list.New(keyeditlistitem.Constructor)
 
 	w.layout = layout.NewCenterLayout(
 		w.translationFieldsList,

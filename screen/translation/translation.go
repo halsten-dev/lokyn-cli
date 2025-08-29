@@ -1,4 +1,4 @@
-package home
+package translation
 
 import (
 	"errors"
@@ -33,7 +33,7 @@ func New() *Screen {
 	s.title = orvyn.NewSimpleRenderable(lokyn.L("home"))
 	s.title.SizeConstraint = true
 
-	s.keyList = list.New[engine.DiscoveredKey](keylistitem.Constructor)
+	s.keyList = list.New(keylistitem.Constructor)
 	s.keyList.CursorMovedCallback = s.keyListCursorMoved
 
 	s.keyEdit = keyedit.New()
@@ -55,7 +55,7 @@ func New() *Screen {
 	return s
 }
 
-func (s *Screen) OnEnter(i interface{}) tea.Cmd {
+func (s *Screen) OnEnter(i any) tea.Cmd {
 	keys, err := engine.DiscoverKeys()
 
 	if err != nil {
@@ -97,7 +97,7 @@ func (s *Screen) OnEnter(i interface{}) tea.Cmd {
 	return nil
 }
 
-func (s *Screen) OnExit() interface{} {
+func (s *Screen) OnExit() any {
 	return nil
 }
 
