@@ -8,6 +8,7 @@ import (
 	"lokyn-cli/internal/translate"
 	"lokyn-cli/screen"
 	"lokyn-cli/screen/projectloading"
+	"lokyn-cli/screen/reconsiliation"
 	"lokyn-cli/screen/translation"
 
 	"github.com/halsten-dev/orvyn"
@@ -53,6 +54,7 @@ func main() {
 
 	orvyn.RegisterScreen(screen.IDProjectLoading, projectloading.New())
 	orvyn.RegisterScreen(screen.IDTranslation, translation.New())
+	orvyn.RegisterScreen(screen.IDReconsiliation, reconsiliation.New())
 
 	orvyn.SwitchScreen(screen.IDProjectLoading)
 

@@ -97,7 +97,7 @@ func New() *Screen {
 	return s
 }
 
-func (s *Screen) OnEnter(i interface{}) tea.Cmd {
+func (s *Screen) OnEnter(i any) tea.Cmd {
 	var err error
 
 	bubblehelp.SwitchContext(keybind.ContextProjectLoading)
