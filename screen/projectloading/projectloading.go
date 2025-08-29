@@ -3,11 +3,6 @@ package projectloading
 import (
 	"errors"
 	"fmt"
-	"github.com/charmbracelet/bubbles/key"
-	tea "github.com/charmbracelet/bubbletea"
-	"github.com/halsten-dev/bubblehelp"
-	"github.com/halsten-dev/lokyn"
-	"github.com/halsten-dev/orvyn"
 	"lokyn-cli/engine"
 	"lokyn-cli/internal/keybind"
 	"lokyn-cli/internal/layout"
@@ -19,6 +14,12 @@ import (
 	"lokyn-cli/widget/textinput"
 	"os"
 	"strings"
+
+	"github.com/charmbracelet/bubbles/key"
+	tea "github.com/charmbracelet/bubbletea"
+	"github.com/halsten-dev/bubblehelp"
+	"github.com/halsten-dev/lokyn"
+	"github.com/halsten-dev/orvyn"
 )
 
 var (
@@ -106,7 +107,7 @@ func (s *Screen) OnEnter(i interface{}) tea.Cmd {
 	if err != nil {
 		s.project = engine.Project{}
 	} else {
-		return orvyn.SwitchScreen(screen.IDHome)
+		return orvyn.SwitchScreen(screen.IDReconsiliation)
 	}
 
 	orvyn.OpenDialog("AskProjectCreation", popup.NewYesNo(
@@ -118,7 +119,7 @@ func (s *Screen) OnEnter(i interface{}) tea.Cmd {
 	return s.exportPath.Init()
 }
 
-func (s *Screen) OnExit() interface{} {
+func (s *Screen) OnExit() any {
 	return s.project
 }
 
@@ -128,7 +129,7 @@ func (s *Screen) Update(msg tea.Msg) tea.Cmd {
 		switch {
 		case key.Matches(msg, keybind.Enter):
 			if s.projectCreation() {
-				return orvyn.SwitchScreen(screen.IDHome)
+				return orvyn.SwitchScreen(screen.IDReconsiliation)
 			}
 
 		case key.Matches(msg, keybind.Esc):

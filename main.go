@@ -2,14 +2,15 @@ package main
 
 import (
 	"embed"
-	"github.com/halsten-dev/orvyn"
 	"log"
 	"lokyn-cli/internal/config"
 	"lokyn-cli/internal/keybind"
 	"lokyn-cli/internal/translate"
 	"lokyn-cli/screen"
-	"lokyn-cli/screen/home"
 	"lokyn-cli/screen/projectloading"
+	"lokyn-cli/screen/translation"
+
+	"github.com/halsten-dev/orvyn"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/halsten-dev/bubblehelp"
@@ -51,7 +52,7 @@ func main() {
 	orvyn.Init()
 
 	orvyn.RegisterScreen(screen.IDProjectLoading, projectloading.New())
-	orvyn.RegisterScreen(screen.IDHome, home.New())
+	orvyn.RegisterScreen(screen.IDTranslation, translation.New())
 
 	orvyn.SwitchScreen(screen.IDProjectLoading)
 
