@@ -60,3 +60,15 @@ func ProjectSave(project *Project) error {
 
 	return nil
 }
+
+func ImportTranslations(project *Project) (KeyLangMap, error) {
+	langKeyMap, err := importAllTranslationFiles(*project)
+
+	if err != nil {
+		return nil, err
+	}
+
+	keyLangMap := ConvertLangKeyMap(langKeyMap)
+
+	return keyLangMap, nil
+}
