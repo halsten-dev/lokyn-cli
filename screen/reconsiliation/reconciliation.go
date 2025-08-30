@@ -116,6 +116,8 @@ func (s *Screen) OnEnter(i any) tea.Cmd {
 	s.dataKeyList.SetItems(s.translationKeys)
 
 	s.focusManager.Focus(0)
+	s.discoveredKeyList.FocusItem(0)
+	s.dataKeyList.FocusItem(0)
 
 	return nil
 }
