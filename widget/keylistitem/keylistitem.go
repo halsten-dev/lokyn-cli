@@ -3,9 +3,9 @@ package keylistitem
 import (
 	"github.com/charmbracelet/lipgloss"
 	"github.com/halsten-dev/orvyn"
+	"github.com/halsten-dev/orvyn/theme"
 	"github.com/halsten-dev/orvyn/widget/list"
 	"lokyn-cli/engine"
-	"lokyn-cli/internal/style"
 )
 
 type Widget struct {
@@ -21,14 +21,15 @@ func Constructor(data engine.DiscoveredKey) list.IListItem {
 	w := new(Widget)
 
 	w.data = data
-	w.style = style.BlurredStyle
+
+	w.OnBlur()
 
 	return w
 }
 
 func (w *Widget) Resize(size orvyn.Size) {
-	size.Width -= style.BlurredStyle.GetHorizontalFrameSize()
-	size.Height = lipgloss.Height(style.BlurredStyle.Render(string(w.data.Key)))
+	size.Width -= w.style.GetHorizontalFrameSize()
+	size.Height = lipgloss.Height(w.style.Render(string(w.data.Key)))
 
 	w.BaseWidget.Resize(size)
 }
@@ -42,11 +43,11 @@ func (w *Widget) Render() string {
 }
 
 func (w *Widget) OnFocus() {
-	w.style = style.FocusedStyle
+	w.style = orvyn.GetTheme().Style(theme.FocusedWidgetStyleID)
 }
 
 func (w *Widget) OnBlur() {
-	w.style = style.BlurredStyle
+	w.style = orvyn.GetTheme().Style(theme.BlurredWidgetStyleID)
 }
 
 func (w *Widget) OnEnterInput() {}

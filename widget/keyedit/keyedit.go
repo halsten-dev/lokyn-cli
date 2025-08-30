@@ -1,6 +1,7 @@
 package keyedit
 
 import (
+	tea "github.com/charmbracelet/bubbletea"
 	"github.com/halsten-dev/orvyn"
 	"github.com/halsten-dev/orvyn/widget/list"
 	"lokyn-cli/engine"
@@ -38,13 +39,29 @@ func (w *Widget) Resize(size orvyn.Size) {
 	w.layout.Resize(size)
 }
 
+func (w *Widget) Update(msg tea.Msg) tea.Cmd {
+	cmd := w.translationFieldsList.Update(msg)
+
+	return cmd
+}
+
 func (w *Widget) Render() string {
 	return w.layout.Render()
 }
 
-func (w *Widget) OnFocus() {}
+func (w *Widget) OnFocus() {
+	w.translationFieldsList.OnFocus()
+	w.translationFieldsList.FocusItem(0)
+}
 
-func (w *Widget) OnBlur() {}
+func (w *Widget) OnBlur() {
+	w.translationFieldsList.OnBlur()
+	w.translationFieldsList.BlurCurrent()
+}
+
+func (w *Widget) IsInputting() bool {
+	return w.translationFieldsList.IsInputting()
+}
 
 func (w *Widget) OnEnterInput() {}
 

@@ -11,7 +11,6 @@ import (
 	"lokyn-cli/widget/help"
 	"lokyn-cli/widget/label"
 	"lokyn-cli/widget/statusmessage"
-	"lokyn-cli/widget/textinput"
 	"os"
 	"strings"
 
@@ -20,6 +19,7 @@ import (
 	"github.com/halsten-dev/bubblehelp"
 	"github.com/halsten-dev/lokyn"
 	"github.com/halsten-dev/orvyn"
+	"github.com/halsten-dev/orvyn/widget/textinput"
 )
 
 var (
