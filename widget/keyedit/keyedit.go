@@ -18,6 +18,8 @@ type Widget struct {
 	translations []engine.Translation
 
 	layout *layout.CenterLayout
+
+	project engine.Project
 }
 
 func New() *Widget {
@@ -41,6 +43,8 @@ func (w *Widget) Resize(size orvyn.Size) {
 
 func (w *Widget) Update(msg tea.Msg) tea.Cmd {
 	cmd := w.translationFieldsList.Update(msg)
+
+	w.translations = w.translationFieldsList.GetItems()
 
 	return cmd
 }
@@ -80,7 +84,13 @@ func (w *Widget) SetTranslations(langMap map[engine.Lang]engine.Translation) {
 	w.translationFieldsList.SetItems(w.translations)
 }
 
+func (w *Widget) GetTranslations() []engine.Translation {
+	return w.translations
+}
+
 func (w *Widget) InitTranslations(p engine.Project) {
+	w.project = p
+
 	w.translations = make([]engine.Translation, len(p.ManagedLanguages))
 
 	for i, l := range p.ManagedLanguages {

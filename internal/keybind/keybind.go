@@ -31,6 +31,7 @@ var (
 	FKey          key.Binding
 	HKey          key.Binding
 	IKey          key.Binding
+	KKey          key.Binding
 	LKey          key.Binding
 	MKey          key.Binding
 	NKey          key.Binding
@@ -120,6 +121,9 @@ func Init() {
 	IKey = key.NewBinding(
 		key.WithKeys("i"),
 		key.WithHelp("i", "i key"))
+	KKey = key.NewBinding(
+		key.WithKeys("k"),
+		key.WithHelp("k", "k key"))
 	LKey = key.NewBinding(
 		key.WithKeys("l"),
 		key.WithHelp("l", "l key"))

@@ -32,7 +32,7 @@ type Widget struct {
 	layout *layout.VBoxFullLayout
 }
 
-func Constructor(data engine.Translation) list.IListItem {
+func Constructor(data engine.Translation) list.IListItem[engine.Translation] {
 	w := new(Widget)
 
 	w.data = data
@@ -82,6 +82,9 @@ func (w *Widget) Resize(size orvyn.Size) {
 func (w *Widget) Update(msg tea.Msg) tea.Cmd {
 	cmd := w.focusManager.Update(msg)
 
+	w.data.OneValue = w.tiOneValue.Value()
+	w.data.OtherValue = w.tiOtherValue.Value()
+
 	return cmd
 }
 
@@ -110,4 +113,8 @@ func (w *Widget) OnEnterInput() {
 
 func (w *Widget) OnExitInput() {
 	w.focusManager.BlurCurrent()
+}
+
+func (w *Widget) GetData() engine.Translation {
+	return w.data
 }

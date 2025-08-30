@@ -2,12 +2,16 @@ package translation
 
 import (
 	"errors"
+	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/halsten-dev/lokyn"
 	"github.com/halsten-dev/orvyn"
 	"github.com/halsten-dev/orvyn/widget/list"
+	"github.com/halsten-dev/orvyn/widget/statusmessage"
 	"lokyn-cli/engine"
+	"lokyn-cli/internal/keybind"
 	"lokyn-cli/internal/layout"
+	"lokyn-cli/internal/translate"
 	"lokyn-cli/widget/keyedit"
 	"slices"
 	"strings"
@@ -18,6 +22,8 @@ type Screen struct {
 
 	keyList *list.Widget[string]
 	keyEdit *keyedit.Widget
+
+	statusMessage *statusmessage.Widget
 
 	focusManager *orvyn.FocusManager
 
@@ -39,16 +45,25 @@ func New() *Screen {
 
 	s.keyEdit = keyedit.New()
 
+	s.statusMessage = statusmessage.New()
+
 	s.focusManager = orvyn.NewFocusManager()
 	s.focusManager.Add(s.keyList)
 	s.focusManager.Add(s.keyEdit)
 
 	s.layout = layout.NewCenterLayout(
-		layout.NewHBoxFixedRatioLayout(
-			10, 2, 0,
-			[]layout.FixedRatioRenderable{
-				layout.NewFixedRatioRenderable(0.30, s.keyList),
-				layout.NewFixedRatioRenderable(0.70, s.keyEdit),
+		layout.NewMaxWidthVBoxFullLayout(
+			orvyn.NewSize(0, 0),
+			0,
+			[]orvyn.Renderable{
+				layout.NewHBoxFixedRatioLayout(
+					10, 2, 0,
+					[]layout.FixedRatioRenderable{
+						layout.NewFixedRatioRenderable(0.30, s.keyList),
+						layout.NewFixedRatioRenderable(0.70, s.keyEdit),
+					},
+				),
+				s.statusMessage,
 			},
 		),
 	)
@@ -79,6 +94,7 @@ func (s *Screen) OnEnter(i any) tea.Cmd {
 
 	s.focusManager.Focus(0)
 	s.keyList.FocusItem(0)
+	s.keyListCursorMoved(0)
 
 	return nil
 }
@@ -88,6 +104,23 @@ func (s *Screen) OnExit() any {
 }
 
 func (s *Screen) Update(msg tea.Msg) tea.Cmd {
+	switch msg := msg.(type) {
+	case tea.KeyMsg:
+		switch {
+		case key.Matches(msg, keybind.TKey):
+			if !s.keyEdit.IsInputting() {
+				s.translateAll()
+			}
+
+		case key.Matches(msg, keybind.KKey):
+			if !s.keyEdit.IsInputting() {
+				s.getCurrentKey()
+			}
+
+		}
+
+	}
+
 	cmd := s.focusManager.Update(msg)
 
 	return cmd
@@ -98,8 +131,22 @@ func (s *Screen) Render() orvyn.Layout {
 }
 
 func (s *Screen) keyListCursorMoved(index int) {
+	s.updateData()
+
 	s.keyEdit.SetTranslations(
 		s.data[engine.Key(s.keys[index])])
+}
+
+func (s *Screen) updateData() {
+	translations := s.keyEdit.GetTranslations()
+
+	for _, t := range translations {
+		if t.Key == "" {
+			continue
+		}
+
+		s.data[t.Key][t.Lang] = t
+	}
 }
 
 func (s *Screen) updateKeyList() {
@@ -108,4 +155,57 @@ func (s *Screen) updateKeyList() {
 	})
 
 	s.keyList.SetItems(s.keys)
+}
+
+func (s *Screen) translateAll() {
+	var err error
+	var trans engine.Translation
+
+	s.updateData()
+
+	mainLang := s.project.ManagedLanguages[0]
+	currentKey := engine.Key(s.keys[s.keyList.GetGlobalIndex()])
+
+	mainLangTrans := s.data[currentKey][mainLang]
+
+	for _, l := range s.project.ManagedLanguages {
+		if l == mainLang {
+			continue
+		}
+
+		trans = s.data[currentKey][l]
+
+		trans.OneValue, err = translate.Get(mainLangTrans.OneValue, string(mainLang), string(l))
+
+		if err != nil {
+			s.statusMessage.SetError(err)
+			return
+		}
+
+		if trans.IsPlural {
+			trans.OtherValue, err = translate.Get(mainLangTrans.OtherValue, string(mainLang), string(l))
+
+			if err != nil {
+				s.statusMessage.SetError(err)
+				return
+			}
+		}
+
+		s.data[currentKey][l] = trans
+	}
+
+	s.keyEdit.SetTranslations(s.data[currentKey])
+}
+
+func (s *Screen) getCurrentKey() {
+	mainLang := s.project.ManagedLanguages[0]
+	currentKey := engine.Key(s.keys[s.keyList.GetGlobalIndex()])
+
+	mainLangTrans := s.data[currentKey][mainLang]
+
+	mainLangTrans.OneValue = string(currentKey)
+
+	s.data[currentKey][mainLang] = mainLangTrans
+
+	s.keyEdit.SetTranslations(s.data[currentKey])
 }

@@ -17,7 +17,7 @@ type Widget struct {
 	style lipgloss.Style
 }
 
-func Constructor(data engine.DiscoveredKey) list.IListItem {
+func Constructor(data engine.DiscoveredKey) list.IListItem[engine.DiscoveredKey] {
 	w := new(Widget)
 
 	w.data = data
@@ -53,3 +53,7 @@ func (w *Widget) OnBlur() {
 func (w *Widget) OnEnterInput() {}
 
 func (w *Widget) OnExitInput() {}
+
+func (w *Widget) GetData() engine.DiscoveredKey {
+	return w.data
+}
