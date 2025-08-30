@@ -57,7 +57,7 @@ func New() *Screen {
 			0,
 			[]orvyn.Renderable{
 				layout.NewHBoxFixedRatioLayout(
-					10, 2, 0,
+					0, 2, 0,
 					[]layout.FixedRatioRenderable{
 						layout.NewFixedRatioRenderable(0.30, s.keyList),
 						layout.NewFixedRatioRenderable(0.70, s.keyEdit),
@@ -104,21 +104,28 @@ func (s *Screen) OnExit() any {
 }
 
 func (s *Screen) Update(msg tea.Msg) tea.Cmd {
-	switch msg := msg.(type) {
-	case tea.KeyMsg:
-		switch {
-		case key.Matches(msg, keybind.TKey):
-			if !s.keyEdit.IsInputting() {
+	if !s.keyEdit.IsInputting() {
+		switch msg := msg.(type) {
+		case tea.KeyMsg:
+			switch {
+			case key.Matches(msg, keybind.TKey):
 				s.translateAll()
-			}
 
-		case key.Matches(msg, keybind.KKey):
-			if !s.keyEdit.IsInputting() {
+			case key.Matches(msg, keybind.KKey):
 				s.getCurrentKey()
+
+			case key.Matches(msg, keybind.XKey):
+				err := engine.ExportAllTranslations(&s.project, s.data)
+
+				if err != nil {
+					s.statusMessage.SetError(err)
+					return nil
+				}
+
+				s.statusMessage.SetMessage(lokyn.L("Successfully exported translations"),
+					statusmessage.SuccessMessage)
 			}
-
 		}
-
 	}
 
 	cmd := s.focusManager.Update(msg)
@@ -174,6 +181,16 @@ func (s *Screen) translateAll() {
 		}
 
 		trans = s.data[currentKey][l]
+
+		if trans.Lang != l {
+			trans = engine.Translation{
+				Key:        currentKey,
+				Lang:       l,
+				OneValue:   "",
+				OtherValue: "",
+				IsPlural:   mainLangTrans.IsPlural,
+			}
+		}
 
 		trans.OneValue, err = translate.Get(mainLangTrans.OneValue, string(mainLang), string(l))
 

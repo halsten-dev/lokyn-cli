@@ -41,6 +41,7 @@ var (
 	TKey          key.Binding
 	UKey          key.Binding
 	WKey          key.Binding
+	XKey          key.Binding
 	YKey          key.Binding
 	YKeyCtrl      key.Binding
 )
@@ -154,6 +155,9 @@ func Init() {
 	YKey = key.NewBinding(
 		key.WithKeys("y"),
 		key.WithHelp("y", "y key"))
+	XKey = key.NewBinding(
+		key.WithKeys("x"),
+		key.WithHelp("x", "x key"))
 	YKeyCtrl = key.NewBinding(
 		key.WithKeys("ctrl+y"),
 		key.WithHelp("ctrl+y", "ctrl+y key"))

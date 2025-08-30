@@ -13,6 +13,7 @@ import (
 	"lokyn-cli/internal/layout"
 	"lokyn-cli/screen"
 	"lokyn-cli/widget/keylistitem"
+	"slices"
 )
 
 type Screen struct {
@@ -22,9 +23,10 @@ type Screen struct {
 	dataKeyTitle *orvyn.SimpleRenderable
 	dataKeyList  *list.Widget[engine.DiscoveredKey]
 
-	discoveredKeys  engine.Keys
-	translationKeys engine.Keys
-	data            engine.KeyLangMap
+	discoveredKeys      engine.Keys
+	translationKeys     engine.Keys
+	alreadyExistingKeys []engine.Key
+	data                engine.KeyLangMap
 
 	layout *layout.HBoxGrowLayout
 
@@ -148,14 +150,16 @@ func (s *Screen) Render() orvyn.Layout {
 func (s *Screen) compareKeys() {
 	var foundIndex int
 
-	for i := len(s.translationKeys) - 1; i >= 0; i-- {
-		foundIndex = findInKeyList(s.translationKeys[i].Key, &s.discoveredKeys)
+	s.alreadyExistingKeys = make([]engine.Key, 0)
+
+	for _, v := range s.translationKeys {
+		foundIndex = findInKeyList(v.Key, &s.discoveredKeys)
 
 		if foundIndex == -1 {
 			continue
 		}
 
-		s.translationKeys = helper.SliceRemove(s.translationKeys, i)
+		s.alreadyExistingKeys = append(s.alreadyExistingKeys, v.Key)
 	}
 
 	for i := len(s.discoveredKeys) - 1; i >= 0; i-- {
@@ -166,6 +170,16 @@ func (s *Screen) compareKeys() {
 		}
 
 		s.discoveredKeys = helper.SliceRemove(s.discoveredKeys, i)
+	}
+
+	for _, k := range s.alreadyExistingKeys {
+		foundIndex = findInKeyList(k, &s.translationKeys)
+
+		if foundIndex == -1 {
+			continue
+		}
+
+		s.translationKeys = helper.SliceRemove(s.translationKeys, foundIndex)
 	}
 }
 
@@ -179,6 +193,10 @@ func (s *Screen) mergeData() {
 		foundIndex = findInKeyList(k, &s.translationKeys)
 
 		if foundIndex >= 0 {
+			continue
+		}
+
+		if slices.Contains(s.alreadyExistingKeys, k) {
 			continue
 		}
 

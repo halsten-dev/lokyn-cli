@@ -1,6 +1,9 @@
 package engine
 
 import (
+	"bytes"
+	"errors"
+	"fmt"
 	"os"
 	"path"
 )
@@ -71,4 +74,59 @@ func ImportTranslations(project *Project) (KeyLangMap, error) {
 	keyLangMap := ConvertLangKeyMap(langKeyMap)
 
 	return keyLangMap, nil
+}
+
+func ExportAllTranslations(project *Project, data KeyLangMap) error {
+	var err error
+	var content bytes.Buffer
+	var filePath string
+	var count int
+
+	exportData := ConvertKeyLangMap(data)
+
+	for _, l := range project.ManagedLanguages {
+		filePath = path.Join(project.ExportDir, fmt.Sprintf("%s.json", l))
+		err = os.Remove(filePath)
+
+		if err != nil {
+			if !errors.Is(err, os.ErrNotExist) {
+				return err
+			}
+		}
+
+		content.Reset()
+
+		content.WriteString("{")
+
+		count = 0
+
+		for k, t := range exportData[l] {
+			if t.OneValue == "" {
+				continue
+			}
+
+			if count > 0 {
+				content.WriteString(",")
+			}
+
+			if t.IsPlural {
+				content.WriteString(fmt.Sprintf(`"%s":{"One":"%s", "Other":"%s"}`,
+					k, t.OneValue, t.OtherValue))
+			} else {
+				content.WriteString(fmt.Sprintf(`"%s":"%s"`, k, t.OneValue))
+			}
+
+			count++
+		}
+
+		content.WriteString("}")
+
+		err = os.WriteFile(filePath, content.Bytes(), 0777)
+
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
