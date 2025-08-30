@@ -2,6 +2,7 @@ package engine
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 	"path"
@@ -20,7 +21,11 @@ func importTranslationFile(exportDir string, lang Lang) (map[Key]Translation, er
 		fmt.Sprintf("%s.json", lang)))
 
 	if err != nil {
-		return nil, err
+		if !errors.Is(err, os.ErrNotExist) {
+			return nil, err
+		}
+
+		return nil, nil
 	}
 
 	err = json.Unmarshal(content, &importedTranslations)

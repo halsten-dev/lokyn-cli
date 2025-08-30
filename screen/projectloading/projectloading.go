@@ -107,7 +107,7 @@ func (s *Screen) OnEnter(i any) tea.Cmd {
 	if err != nil {
 		s.project = engine.Project{}
 	} else {
-		return orvyn.SwitchScreen(screen.IDReconsiliation)
+		return orvyn.SwitchScreen(screen.IDReconciliation)
 	}
 
 	orvyn.OpenDialog("AskProjectCreation", popup.NewYesNo(
@@ -129,7 +129,7 @@ func (s *Screen) Update(msg tea.Msg) tea.Cmd {
 		switch {
 		case key.Matches(msg, keybind.Enter):
 			if s.projectCreation() {
-				return orvyn.SwitchScreen(screen.IDReconsiliation)
+				return orvyn.SwitchScreen(screen.IDReconciliation)
 			}
 
 		case key.Matches(msg, keybind.Esc):

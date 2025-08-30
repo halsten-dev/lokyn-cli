@@ -6,6 +6,6 @@ import (
 
 const (
 	IDProjectLoading orvyn.ScreenID = "project_loading"
-	IDReconsiliation orvyn.ScreenID = "reconsiliation"
+	IDReconciliation orvyn.ScreenID = "reconciliation"
 	IDTranslation    orvyn.ScreenID = "translation"
 )

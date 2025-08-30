@@ -9,20 +9,21 @@ import (
 	"lokyn-cli/engine"
 	"lokyn-cli/internal/layout"
 	"lokyn-cli/widget/keyedit"
-	"lokyn-cli/widget/keylistitem"
+	"slices"
+	"strings"
 )
 
 type Screen struct {
 	title *orvyn.SimpleRenderable
 
-	keyList *list.Widget[engine.DiscoveredKey]
+	keyList *list.Widget[string]
 	keyEdit *keyedit.Widget
 
 	focusManager *orvyn.FocusManager
 
 	layout *layout.CenterLayout
 
-	keys    engine.Keys
+	keys    []string
 	data    engine.KeyLangMap
 	project engine.Project
 }
@@ -30,10 +31,10 @@ type Screen struct {
 func New() *Screen {
 	s := new(Screen)
 
-	s.title = orvyn.NewSimpleRenderable(lokyn.L("home"))
+	s.title = orvyn.NewSimpleRenderable(lokyn.L("Translation"))
 	s.title.SizeConstraint = true
 
-	s.keyList = list.New(keylistitem.Constructor)
+	s.keyList = list.New(list.SimpleListItemConstructor)
 	s.keyList.CursorMovedCallback = s.keyListCursorMoved
 
 	s.keyEdit = keyedit.New()
@@ -56,39 +57,23 @@ func New() *Screen {
 }
 
 func (s *Screen) OnEnter(i any) tea.Cmd {
-	keys, err := engine.DiscoverKeys()
-
-	if err != nil {
-		panic(err)
-	}
-
-	s.keys = keys
-
 	s.data = make(engine.KeyLangMap)
 
-	project, ok := i.(engine.Project)
+	data, ok := i.(engine.TranslationData)
 
 	if !ok {
-		panic(errors.New("invalid project loaded"))
+		panic(errors.New("invalid translation data passed to translation screen"))
 	}
 
-	s.project = project
+	s.project = data.Project
+	s.data = data.Data
+	s.keys = make([]string, 0)
 
-	s.keyEdit.InitTranslations(project)
-
-	for _, k := range keys {
-		s.data[k.Key] = make(map[engine.Lang]engine.Translation)
-
-		for _, ml := range project.ManagedLanguages {
-			s.data[k.Key][ml] = engine.Translation{
-				Key:        k.Key,
-				Lang:       ml,
-				OneValue:   "",
-				OtherValue: "",
-				IsPlural:   k.IsPlural,
-			}
-		}
+	for k := range s.data {
+		s.keys = append(s.keys, string(k))
 	}
+
+	s.keyEdit.InitTranslations(data.Project)
 
 	s.updateKeyList()
 
@@ -112,9 +97,14 @@ func (s *Screen) Render() orvyn.Layout {
 }
 
 func (s *Screen) keyListCursorMoved(index int) {
-	s.keyEdit.SetTranslations(s.data[s.keys[index].Key])
+	s.keyEdit.SetTranslations(
+		s.data[engine.Key(s.keys[index])])
 }
 
 func (s *Screen) updateKeyList() {
+	slices.SortFunc(s.keys, func(a, b string) int {
+		return strings.Compare(strings.ToLower(a), strings.ToLower(b))
+	})
+
 	s.keyList.SetItems(s.keys)
 }

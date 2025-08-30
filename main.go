@@ -54,7 +54,7 @@ func main() {
 
 	orvyn.RegisterScreen(screen.IDProjectLoading, projectloading.New())
 	orvyn.RegisterScreen(screen.IDTranslation, translation.New())
-	orvyn.RegisterScreen(screen.IDReconsiliation, reconsiliation.New())
+	orvyn.RegisterScreen(screen.IDReconciliation, reconsiliation.New())
 
 	orvyn.SwitchScreen(screen.IDProjectLoading)
 

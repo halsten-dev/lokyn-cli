@@ -40,3 +40,8 @@ type Translation struct {
 	OtherValue string
 	IsPlural   bool
 }
+
+type TranslationData struct {
+	Project Project
+	Data    KeyLangMap
+}
