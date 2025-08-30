@@ -9,8 +9,6 @@ import (
 	"lokyn-cli/screen"
 	"lokyn-cli/screen/dialog/popup"
 	"lokyn-cli/widget/help"
-	"lokyn-cli/widget/label"
-	"lokyn-cli/widget/statusmessage"
 	"os"
 	"strings"
 
@@ -19,6 +17,8 @@ import (
 	"github.com/halsten-dev/bubblehelp"
 	"github.com/halsten-dev/lokyn"
 	"github.com/halsten-dev/orvyn"
+	"github.com/halsten-dev/orvyn/widget/label"
+	"github.com/halsten-dev/orvyn/widget/statusmessage"
 	"github.com/halsten-dev/orvyn/widget/textinput"
 )
 
