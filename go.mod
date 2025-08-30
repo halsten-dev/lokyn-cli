@@ -8,7 +8,7 @@ require (
 	github.com/charmbracelet/lipgloss v1.1.0
 	github.com/halsten-dev/bubblehelp v1.0.1
 	github.com/halsten-dev/lokyn v1.0.0
-	github.com/halsten-dev/orvyn v0.0.0-20250830214638-41634916164f
+	github.com/halsten-dev/orvyn v0.0.0-20250830232242-59ccb3185248
 	github.com/spf13/viper v1.20.1
 )
 
@@ -34,7 +34,6 @@ require (
 	github.com/pelletier/go-toml/v2 v2.2.3 // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
 	github.com/sagikazarmark/locafero v0.7.0 // indirect
-	github.com/sahilm/fuzzy v0.1.1 // indirect
 	github.com/sourcegraph/conc v0.3.0 // indirect
 	github.com/spf13/afero v1.12.0 // indirect
 	github.com/spf13/cast v1.7.1 // indirect

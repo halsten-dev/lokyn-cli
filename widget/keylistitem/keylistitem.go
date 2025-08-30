@@ -57,3 +57,7 @@ func (w *Widget) OnExitInput() {}
 func (w *Widget) GetData() engine.DiscoveredKey {
 	return w.data
 }
+
+func (w *Widget) FilterValue() string {
+	return string(w.data.Key)
+}

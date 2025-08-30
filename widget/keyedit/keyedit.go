@@ -28,6 +28,7 @@ func New() *Widget {
 	w.BaseWidget = orvyn.NewBaseWidget()
 
 	w.translationFieldsList = list.New(keyeditlistitem.Constructor)
+	w.translationFieldsList.SetFilterable(false)
 
 	w.layout = layout.NewCenterLayout(
 		w.translationFieldsList,

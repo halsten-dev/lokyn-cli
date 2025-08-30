@@ -118,3 +118,7 @@ func (w *Widget) OnExitInput() {
 func (w *Widget) GetData() engine.Translation {
 	return w.data
 }
+
+func (w *Widget) FilterValue() string {
+	return ""
+}
