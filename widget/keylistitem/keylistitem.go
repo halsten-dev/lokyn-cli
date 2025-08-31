@@ -12,12 +12,12 @@ type Widget struct {
 	orvyn.BaseWidget
 	orvyn.BaseFocusable
 
-	data engine.DiscoveredKey
+	data *engine.DiscoveredKey
 
 	style lipgloss.Style
 }
 
-func Constructor(data engine.DiscoveredKey) list.IListItem[engine.DiscoveredKey] {
+func Constructor(data *engine.DiscoveredKey) list.IListItem {
 	w := new(Widget)
 
 	w.data = data
@@ -53,10 +53,6 @@ func (w *Widget) OnBlur() {
 func (w *Widget) OnEnterInput() {}
 
 func (w *Widget) OnExitInput() {}
-
-func (w *Widget) GetData() engine.DiscoveredKey {
-	return w.data
-}
 
 func (w *Widget) FilterValue() string {
 	return string(w.data.Key)

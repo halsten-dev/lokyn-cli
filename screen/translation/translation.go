@@ -93,7 +93,7 @@ func (s *Screen) OnEnter(i any) tea.Cmd {
 	s.updateKeyList()
 
 	s.focusManager.Focus(0)
-	s.keyList.FocusItem(0)
+	s.keyList.FocusFirst()
 	s.keyListCursorMoved(0)
 
 	return nil

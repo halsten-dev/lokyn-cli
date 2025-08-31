@@ -56,7 +56,7 @@ func (w *Widget) Render() string {
 
 func (w *Widget) OnFocus() {
 	w.translationFieldsList.OnFocus()
-	w.translationFieldsList.FocusItem(0)
+	w.translationFieldsList.FocusFirst()
 }
 
 func (w *Widget) OnBlur() {

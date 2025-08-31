@@ -23,7 +23,7 @@ type Widget struct {
 	tiOneValue   *textinput.Widget
 	tiOtherValue *textinput.Widget
 
-	data engine.Translation
+	data *engine.Translation
 
 	style lipgloss.Style
 
@@ -32,7 +32,7 @@ type Widget struct {
 	layout *layout.VBoxFullLayout
 }
 
-func Constructor(data engine.Translation) list.IListItem[engine.Translation] {
+func Constructor(data *engine.Translation) list.IListItem {
 	w := new(Widget)
 
 	w.data = data
@@ -113,10 +113,6 @@ func (w *Widget) OnEnterInput() {
 
 func (w *Widget) OnExitInput() {
 	w.focusManager.BlurCurrent()
-}
-
-func (w *Widget) GetData() engine.Translation {
-	return w.data
 }
 
 func (w *Widget) FilterValue() string {
