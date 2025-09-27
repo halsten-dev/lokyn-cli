@@ -2,15 +2,16 @@ package popup
 
 import (
 	"fmt"
+	"lokyn-cli/internal/keybind"
+	"lokyn-cli/internal/style"
+	"strings"
+
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/halsten-dev/lokyn"
 	"github.com/halsten-dev/orvyn"
-	"lokyn-cli/internal/keybind"
-	"lokyn-cli/internal/layout"
-	"lokyn-cli/internal/style"
-	"strings"
+	"github.com/halsten-dev/orvyn/layout"
 )
 
 type Option struct {

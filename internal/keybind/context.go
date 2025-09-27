@@ -6,5 +6,6 @@ import (
 
 const (
 	ContextProjectLoading bubblehelp.KeymapContext = "project_loading"
-	ContextHome           bubblehelp.KeymapContext = "home"
+	ContextReconciliation bubblehelp.KeymapContext = "reconciliation"
+	ContextTranslation    bubblehelp.KeymapContext = "translation"
 )

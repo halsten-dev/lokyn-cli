@@ -5,12 +5,13 @@ import (
 	"fmt"
 	"lokyn-cli/engine"
 	"lokyn-cli/internal/keybind"
-	"lokyn-cli/internal/layout"
 	"lokyn-cli/screen"
 	"lokyn-cli/screen/dialog/popup"
 	"lokyn-cli/widget/help"
 	"os"
 	"strings"
+
+	"github.com/halsten-dev/orvyn/layout"
 
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"

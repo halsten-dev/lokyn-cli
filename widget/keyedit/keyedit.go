@@ -1,12 +1,13 @@
 package keyedit
 
 import (
+	"lokyn-cli/engine"
+	"lokyn-cli/widget/keyeditlistitem"
+
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/halsten-dev/orvyn"
+	"github.com/halsten-dev/orvyn/layout"
 	"github.com/halsten-dev/orvyn/widget/list"
-	"lokyn-cli/engine"
-	"lokyn-cli/internal/layout"
-	"lokyn-cli/widget/keyeditlistitem"
 )
 
 type Widget struct {
@@ -56,12 +57,10 @@ func (w *Widget) Render() string {
 
 func (w *Widget) OnFocus() {
 	w.translationFieldsList.OnFocus()
-	w.translationFieldsList.FocusFirst()
 }
 
 func (w *Widget) OnBlur() {
 	w.translationFieldsList.OnBlur()
-	w.translationFieldsList.BlurCurrent()
 }
 
 func (w *Widget) IsInputting() bool {

@@ -2,18 +2,19 @@ package reconciliation
 
 import (
 	"errors"
+	"lokyn-cli/engine"
+	"lokyn-cli/internal/helper"
+	"lokyn-cli/internal/keybind"
+	"lokyn-cli/screen"
+	"lokyn-cli/widget/keylistitem"
+	"slices"
+
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/halsten-dev/lokyn"
 	"github.com/halsten-dev/orvyn"
+	"github.com/halsten-dev/orvyn/layout"
 	"github.com/halsten-dev/orvyn/widget/list"
-	"lokyn-cli/engine"
-	"lokyn-cli/internal/helper"
-	"lokyn-cli/internal/keybind"
-	"lokyn-cli/internal/layout"
-	"lokyn-cli/screen"
-	"lokyn-cli/widget/keylistitem"
-	"slices"
 )
 
 type Screen struct {

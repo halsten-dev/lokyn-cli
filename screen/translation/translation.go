@@ -2,19 +2,20 @@ package translation
 
 import (
 	"errors"
-	"github.com/charmbracelet/bubbles/key"
-	tea "github.com/charmbracelet/bubbletea"
-	"github.com/halsten-dev/lokyn"
-	"github.com/halsten-dev/orvyn"
-	"github.com/halsten-dev/orvyn/widget/list"
-	"github.com/halsten-dev/orvyn/widget/statusmessage"
 	"lokyn-cli/engine"
 	"lokyn-cli/internal/keybind"
-	"lokyn-cli/internal/layout"
 	"lokyn-cli/internal/translate"
 	"lokyn-cli/widget/keyedit"
 	"slices"
 	"strings"
+
+	"github.com/charmbracelet/bubbles/key"
+	tea "github.com/charmbracelet/bubbletea"
+	"github.com/halsten-dev/lokyn"
+	"github.com/halsten-dev/orvyn"
+	"github.com/halsten-dev/orvyn/layout"
+	"github.com/halsten-dev/orvyn/widget/list"
+	"github.com/halsten-dev/orvyn/widget/statusmessage"
 )
 
 type Screen struct {

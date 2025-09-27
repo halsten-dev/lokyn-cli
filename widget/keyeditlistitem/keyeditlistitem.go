@@ -1,16 +1,17 @@
 package keyeditlistitem
 
 import (
+	"lokyn-cli/engine"
+	"lokyn-cli/internal/keybind"
+
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/halsten-dev/orvyn"
+	"github.com/halsten-dev/orvyn/layout"
 	"github.com/halsten-dev/orvyn/theme"
 	"github.com/halsten-dev/orvyn/widget/list"
 	"github.com/halsten-dev/orvyn/widget/textinput"
-	"lokyn-cli/engine"
-	"lokyn-cli/internal/keybind"
-	"lokyn-cli/internal/layout"
 )
 
 type Widget struct {
@@ -70,10 +71,16 @@ func Constructor(data *engine.Translation) list.IListItem {
 }
 
 func (w *Widget) Resize(size orvyn.Size) {
-	w.BaseWidget.Resize(orvyn.NewSize(size.Width, 8))
+	height := 9
+
+	if !w.data.IsPlural {
+		height = 6
+	}
+
+	w.BaseWidget.Resize(orvyn.NewSize(size.Width, height))
 
 	size.Width -= w.style.GetHorizontalFrameSize()
-	size.Height = 6
+	size.Height = height - w.style.GetHorizontalFrameSize()
 
 	w.contentSize = size
 	w.layout.Resize(size)
