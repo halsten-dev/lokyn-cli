@@ -4,9 +4,9 @@ import (
 	"errors"
 	"fmt"
 	"lokyn-cli/engine"
+	"lokyn-cli/internal/dialog"
 	"lokyn-cli/internal/keybind"
 	"lokyn-cli/screen"
-	"lokyn-cli/screen/dialog/popup"
 	"lokyn-cli/widget/help"
 	"os"
 	"strings"
@@ -111,7 +111,7 @@ func (s *Screen) OnEnter(i any) tea.Cmd {
 		return orvyn.SwitchScreen(screen.IDReconciliation)
 	}
 
-	orvyn.OpenDialog("AskProjectCreation", popup.NewYesNo(
+	orvyn.OpenDialog("AskProjectCreation", dialog.YesNoPopup(
 		fmt.Sprintf("Do you want to create a lokyn project in : %s",
 			s.currentDir)), nil)
 
