@@ -76,6 +76,11 @@ func (w *Widget) OnEnterInput() {}
 func (w *Widget) OnExitInput() {}
 
 func (w *Widget) SetTranslations(langMap map[engine.Lang]engine.Translation) {
+	if langMap == nil {
+		w.translationFieldsList.SetItems(make([]engine.Translation, 0))
+		return
+	}
+
 	for lang, trans := range langMap {
 		for i, t := range w.translations {
 			if t.Lang == lang {

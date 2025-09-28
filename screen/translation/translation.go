@@ -105,6 +105,8 @@ func (s *Screen) OnEnter(i any) tea.Cmd {
 	s.keyList.FocusFirst()
 	s.keyListCursorMoved(0)
 
+	s.statusMessage.Reset()
+
 	bubblehelp.SwitchContext(keybind.ContextTranslation)
 	bubblehelp.SetKeybindVisible(keybind.EKey, false)
 
@@ -140,8 +142,9 @@ func (s *Screen) Update(msg tea.Msg) tea.Cmd {
 					statusmessage.SuccessMessage)
 
 			case key.Matches(msg, keybind.Esc):
-				return orvyn.SwitchScreen(screen.IDProjectLoading)
-
+				if s.keyList.FilterState() == list.Unfiltered {
+					return orvyn.SwitchScreen(screen.IDProjectLoading)
+				}
 			}
 		}
 	}
@@ -157,6 +160,11 @@ func (s *Screen) Render() orvyn.Layout {
 
 func (s *Screen) keyListCursorMoved(index int) {
 	s.updateData()
+
+	if index == -1 {
+		s.keyEdit.SetTranslations(nil)
+		return
+	}
 
 	s.keyEdit.SetTranslations(
 		s.data[engine.Key(s.keys[index])])
