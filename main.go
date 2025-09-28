@@ -69,7 +69,7 @@ func main() {
 		FullKeySeparator:           ds,
 		FullKeySeparatorValue:      " ",
 		FullColSeparator:           nds,
-		FullColSeparatorValue:      " • ",
+		FullColSeparatorValue:      "  ",
 	}
 
 	bubblehelp.SetDefaultStyle(helpStyle)
