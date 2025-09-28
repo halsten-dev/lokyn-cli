@@ -23,10 +23,6 @@ import (
 	"github.com/halsten-dev/orvyn/widget/textinput"
 )
 
-var (
-	keymapContext = bubblehelp.NewKeymap(2)
-)
-
 type Screen struct {
 	project engine.Project
 
@@ -58,6 +54,7 @@ func New() *Screen {
 		panic(err)
 	}
 
+	keymapContext := bubblehelp.NewKeymap(2)
 	keymapContext.NewKeyBinding(keybind.Enter, true)
 	keymapContext.SetHelpDesc(keybind.Enter, "create project")
 	keymapContext.NewKeyBinding(keybind.Esc, true)

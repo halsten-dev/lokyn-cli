@@ -5,12 +5,15 @@ import (
 	"lokyn-cli/engine"
 	"lokyn-cli/internal/keybind"
 	"lokyn-cli/internal/translate"
+	"lokyn-cli/screen"
+	"lokyn-cli/widget/help"
 	"lokyn-cli/widget/keyedit"
 	"slices"
 	"strings"
 
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/halsten-dev/bubblehelp"
 	"github.com/halsten-dev/lokyn"
 	"github.com/halsten-dev/orvyn"
 	"github.com/halsten-dev/orvyn/layout"
@@ -25,6 +28,8 @@ type Screen struct {
 	keyEdit *keyedit.Widget
 
 	statusMessage *statusmessage.Widget
+
+	help *help.Widget
 
 	focusManager *orvyn.FocusManager
 
@@ -48,13 +53,15 @@ func New() *Screen {
 
 	s.statusMessage = statusmessage.New()
 
+	s.help = help.New()
+
 	s.focusManager = orvyn.NewFocusManager()
 	s.focusManager.Add(s.keyList)
 	s.focusManager.Add(s.keyEdit)
 
 	s.layout = layout.NewCenterLayout(
 		layout.NewMaxWidthVBoxFullLayout(
-			orvyn.NewSize(0, 0),
+			orvyn.NewSize(0, 1),
 			0,
 			[]orvyn.Renderable{
 				layout.NewHBoxFixedRatioLayout(
@@ -65,6 +72,7 @@ func New() *Screen {
 					},
 				),
 				s.statusMessage,
+				s.help,
 			},
 		),
 	)
@@ -97,6 +105,9 @@ func (s *Screen) OnEnter(i any) tea.Cmd {
 	s.keyList.FocusFirst()
 	s.keyListCursorMoved(0)
 
+	bubblehelp.SwitchContext(keybind.ContextTranslation)
+	bubblehelp.SetKeybindVisible(keybind.EKey, false)
+
 	return nil
 }
 
@@ -116,6 +127,8 @@ func (s *Screen) Update(msg tea.Msg) tea.Cmd {
 				s.getCurrentKey()
 
 			case key.Matches(msg, keybind.XKey):
+				s.updateData()
+
 				err := engine.ExportAllTranslations(&s.project, s.data)
 
 				if err != nil {
@@ -125,6 +138,10 @@ func (s *Screen) Update(msg tea.Msg) tea.Cmd {
 
 				s.statusMessage.SetMessage(lokyn.L("Successfully exported translations"),
 					statusmessage.SuccessMessage)
+
+			case key.Matches(msg, keybind.Esc):
+				return orvyn.SwitchScreen(screen.IDProjectLoading)
+
 			}
 		}
 	}

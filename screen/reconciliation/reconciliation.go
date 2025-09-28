@@ -6,11 +6,13 @@ import (
 	"lokyn-cli/internal/helper"
 	"lokyn-cli/internal/keybind"
 	"lokyn-cli/screen"
+	"lokyn-cli/widget/help"
 	"lokyn-cli/widget/keylistitem"
 	"slices"
 
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/halsten-dev/bubblehelp"
 	"github.com/halsten-dev/lokyn"
 	"github.com/halsten-dev/orvyn"
 	"github.com/halsten-dev/orvyn/layout"
@@ -24,12 +26,14 @@ type Screen struct {
 	dataKeyTitle *orvyn.SimpleRenderable
 	dataKeyList  *list.Widget[engine.DiscoveredKey]
 
+	help *help.Widget
+
 	discoveredKeys      engine.Keys
 	translationKeys     engine.Keys
 	alreadyExistingKeys []engine.Key
 	data                engine.KeyLangMap
 
-	layout *layout.HBoxGrowLayout
+	layout *layout.VBoxFullLayout
 
 	focusManager *orvyn.FocusManager
 
@@ -44,6 +48,8 @@ func New() *Screen {
 
 	s.dataKeyTitle = orvyn.NewSimpleRenderable(lokyn.L("Unused keys"))
 	s.dataKeyList = list.New(keylistitem.Constructor)
+
+	s.help = help.New()
 
 	discoveredListLayout := layout.NewMaxWidthVBoxFullLayout(
 		orvyn.NewSize(0, 0), 1,
@@ -65,10 +71,14 @@ func New() *Screen {
 	s.focusManager.Add(s.discoveredKeyList)
 	s.focusManager.Add(s.dataKeyList)
 
-	s.layout = layout.NewHBoxGrowFullHeightLayout(1, 0,
-		[]orvyn.Renderable{
-			discoveredListLayout,
-			dataListLayout,
+	s.layout = layout.NewMaxWidthVBoxFullLayout(orvyn.NewSize(0, 1),
+		0, []orvyn.Renderable{
+			layout.NewHBoxGrowFullHeightLayout(1, 0,
+				[]orvyn.Renderable{
+					discoveredListLayout,
+					dataListLayout,
+				}),
+			s.help,
 		},
 	)
 
@@ -119,6 +129,8 @@ func (s *Screen) OnEnter(i any) tea.Cmd {
 	s.focusManager.Focus(0)
 	s.discoveredKeyList.FocusFirst()
 	s.dataKeyList.FocusFirst()
+
+	bubblehelp.SwitchContext(keybind.ContextReconciliation)
 
 	return nil
 }

@@ -2,9 +2,11 @@ package keyedit
 
 import (
 	"lokyn-cli/engine"
+	"lokyn-cli/internal/keybind"
 	"lokyn-cli/widget/keyeditlistitem"
 
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/halsten-dev/bubblehelp"
 	"github.com/halsten-dev/orvyn"
 	"github.com/halsten-dev/orvyn/layout"
 	"github.com/halsten-dev/orvyn/widget/list"
@@ -57,10 +59,12 @@ func (w *Widget) Render() string {
 
 func (w *Widget) OnFocus() {
 	w.translationFieldsList.OnFocus()
+	bubblehelp.SetKeybindVisible(keybind.EKey, true)
 }
 
 func (w *Widget) OnBlur() {
 	w.translationFieldsList.OnBlur()
+	bubblehelp.SetKeybindVisible(keybind.EKey, false)
 }
 
 func (w *Widget) IsInputting() bool {

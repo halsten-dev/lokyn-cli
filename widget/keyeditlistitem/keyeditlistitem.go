@@ -7,6 +7,7 @@ import (
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/halsten-dev/bubblehelp"
 	"github.com/halsten-dev/orvyn"
 	"github.com/halsten-dev/orvyn/layout"
 	"github.com/halsten-dev/orvyn/theme"
@@ -116,10 +117,13 @@ func (w *Widget) GetEnterInputKeybind() *key.Binding {
 
 func (w *Widget) OnEnterInput() {
 	w.focusManager.Focus(0)
+	bubblehelp.SwitchContext(keybind.ContextInputMode)
 }
 
 func (w *Widget) OnExitInput() {
 	w.focusManager.BlurCurrent()
+	bubblehelp.SwitchContext(keybind.ContextTranslation)
+	bubblehelp.SetKeybindVisible(keybind.EKey, true)
 }
 
 func (w *Widget) FilterValue() string {
