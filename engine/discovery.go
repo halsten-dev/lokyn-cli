@@ -8,6 +8,8 @@ import (
 	"path/filepath"
 	"regexp"
 	"strings"
+
+	"github.com/halsten-dev/lokyn"
 )
 
 func discoverProject(project *Project, directory string) error {
@@ -141,33 +143,84 @@ func findImport(content []byte) (bool, string) {
 }
 
 func findCalls(keys *Keys, content []byte, prefix string) {
-	pattern := regexp.MustCompile(prefix + `\.(L|P)\(\s*([^,)]+)`)
+	var pCounter int
+	var bKey strings.Builder
+
+	pattern := regexp.MustCompile(prefix + `\.([LP])\(`)
 
 	matches := pattern.FindAllSubmatch(content, -1)
+	matchesIndex := pattern.FindAllIndex(content, -1)
 
-	for _, match := range matches {
-		if len(match) < 3 {
+	for i, match := range matches {
+		pCounter = 1
+
+		if len(match) < 2 {
 			continue
 		}
 
 		callType := string(match[1]) // L or P
-		callKey := string(match[2])
-		callKey = strings.TrimSpace(callKey)
+
+		index := matchesIndex[i][1]
+
+		isInString := false
+		lastStringRune := rune(0)
+		sCounter := 0
+
+		bKey.Reset()
+
+		// discover key
+		_ = lokyn.L("sdoifjs(aodfdsijfoaisdjf" + "dsifjosadif)dsifjosa")
+
+		for {
+			r := rune(content[index])
+
+			if lastStringRune != 0 {
+				if r == lastStringRune && isInString {
+					isInString = false
+					lastStringRune = rune(0)
+				}
+			} else {
+				if r == '"' || r == '`' {
+					isInString = true
+					lastStringRune = r
+					sCounter++
+				}
+			}
+
+			if r == '(' && !isInString {
+				pCounter++
+			}
+
+			if r == ')' && !isInString {
+				pCounter--
+			}
+
+			if pCounter == 0 {
+				break
+			}
+
+			bKey.WriteRune(r)
+
+			index++
+		}
+
+		strKey := bKey.String()
 
 		key := DiscoveredKey{
-			Key:      Key(callKey),
 			IsPlural: callType == "P",
 		}
 
-		if isSurroundedBy(callKey, `"`) || isSurroundedBy(callKey, "`") {
-			key.Key = Key(callKey[1 : len(callKey)-1])
+		if (isSurroundedBy(strKey, `"`) || isSurroundedBy(strKey, "`")) && sCounter == 1 {
+			key.Key = Key(strKey[1 : len(strKey)-1])
 			key.Err = nil
 		} else {
-			key.Key = Key(callKey)
+			key.Key = Key(strKey)
 			key.Err = errors.New("Key is variable, need manual matching")
 		}
 
-		*keys = append(*keys, key)
+		if !keys.containsKey(key.Key) {
+			*keys = append(*keys, key)
+		}
 	}
 }
 

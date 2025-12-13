@@ -11,6 +11,16 @@ type Lang string
 
 type Keys []DiscoveredKey
 
+func (k Keys) containsKey(key Key) bool {
+	for _, v := range k {
+		if v.Key == key {
+			return true
+		}
+	}
+
+	return false
+}
+
 type DiscoveredKey struct {
 	// Key holds the key found in source files of the project.
 	Key Key
