@@ -112,6 +112,8 @@ func registerKeymapContexts() {
 	keymapContext = bubblehelp.NewKeymap(2)
 	keymapContext.NewKeyBinding(keybind.TKey, true)
 	keymapContext.SetHelpDesc(keybind.TKey, lokyn.L("translate"))
+	keymapContext.NewKeyBinding(keybind.ShiftTKey, true)
+	keymapContext.SetHelpDesc(keybind.ShiftTKey, lokyn.L("translate all"))
 	keymapContext.NewKeyBinding(keybind.CKey, true)
 	keymapContext.SetHelpDesc(keybind.CKey, lokyn.L("copy key"))
 	keymapContext.NewKeyBinding(keybind.EKey, true)

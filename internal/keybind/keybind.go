@@ -39,6 +39,7 @@ var (
 	RKey          key.Binding
 	SKey          key.Binding
 	TKey          key.Binding
+	ShiftTKey     key.Binding
 	UKey          key.Binding
 	WKey          key.Binding
 	XKey          key.Binding
@@ -146,6 +147,9 @@ func Init() {
 	TKey = key.NewBinding(
 		key.WithKeys("t"),
 		key.WithHelp("t", "t key"))
+	ShiftTKey = key.NewBinding(
+		key.WithKeys("T"),
+		key.WithHelp("T", "T key"))
 	UKey = key.NewBinding(
 		key.WithKeys("u"),
 		key.WithHelp("u", "u key"))

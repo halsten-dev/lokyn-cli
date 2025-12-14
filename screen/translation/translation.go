@@ -6,6 +6,7 @@ import (
 	"lokyn-cli/internal/keybind"
 	"lokyn-cli/internal/translate"
 	"lokyn-cli/screen"
+	"lokyn-cli/screen/dialog/progress"
 	"lokyn-cli/widget/help"
 	"lokyn-cli/widget/keyedit"
 	"slices"
@@ -37,6 +38,8 @@ type Screen struct {
 
 	data    engine.KeyLangMap
 	project engine.Project
+
+	progressDialog *progress.Screen
 }
 
 func New() *Screen {
@@ -57,6 +60,8 @@ func New() *Screen {
 	s.focusManager = orvyn.NewFocusManager()
 	s.focusManager.Add(s.keyList)
 	s.focusManager.Add(s.keyEdit)
+
+	s.progressDialog = progress.New()
 
 	keyLayout := []layout.FixedRatioRenderable{
 		layout.NewFixedRatioRenderable(0.30, s.keyList),
@@ -126,6 +131,9 @@ func (s *Screen) Update(msg tea.Msg) tea.Cmd {
 			case key.Matches(msg, keybind.TKey):
 				s.translateAll()
 
+			case key.Matches(msg, keybind.ShiftTKey):
+				return s.translateAllKeys()
+
 			case key.Matches(msg, keybind.CKey):
 				s.getCurrentKey()
 
@@ -147,6 +155,14 @@ func (s *Screen) Update(msg tea.Msg) tea.Cmd {
 					return orvyn.SwitchScreen(screen.IDProjectLoading)
 				}
 			}
+		}
+	}
+
+	switch msg := msg.(type) {
+	case orvyn.DialogExitMsg:
+		switch msg.DialogID {
+		case "progressBar":
+			s.keyEdit.SetTranslations(s.data[engine.Key(s.keyList.GetSelectedItem())])
 		}
 	}
 
@@ -193,13 +209,9 @@ func (s *Screen) updateKeyList(keys []string) {
 	s.keyList.SetItems(keys)
 }
 
-func (s *Screen) translateAll() {
+func (s *Screen) translateAllLangs(key engine.Key) {
 	var err error
 	var trans engine.Translation
-
-	s.updateData()
-
-	key := s.keyList.GetSelectedItem()
 
 	mainLang := s.project.ManagedLanguages[0]
 	currentKey := engine.Key(key)
@@ -241,8 +253,53 @@ func (s *Screen) translateAll() {
 
 		s.data[currentKey][l] = trans
 	}
+}
 
-	s.keyEdit.SetTranslations(s.data[currentKey])
+func (s *Screen) translateAll() {
+	s.updateData()
+
+	key := engine.Key(s.keyList.GetSelectedItem())
+
+	s.translateAllLangs(key)
+
+	s.keyEdit.SetTranslations(s.data[key])
+}
+
+func (s *Screen) translateAllKeys() tea.Cmd {
+	// Loop through every keys
+
+	mainLang := s.project.ManagedLanguages[0]
+
+	go func(dial *progress.Screen) {
+		count := 0
+		maxSteps := len(s.data)
+
+		dial.UpdateProgress(count, maxSteps)
+
+		for _, k := range s.data {
+			count++
+			dial.UpdateProgress(count, maxSteps)
+
+			key := k[mainLang].Key
+			trans := s.data[key][mainLang]
+
+			if trans.IsPlural {
+				continue
+			}
+
+			if trans.OneValue != "" {
+				continue
+			}
+
+			trans.OneValue = string(trans.Key)
+
+			s.data[key][mainLang] = trans
+
+			s.translateAllLangs(key)
+		}
+	}(s.progressDialog)
+
+	return orvyn.OpenDialog("progressBar", s.progressDialog, nil)
 }
 
 func (s *Screen) getCurrentKey() {

@@ -10,6 +10,8 @@ github.com/charmbracelet/bubbletea v1.3.10 h1:otUDHWMMzQSB0Pkc87rm691KZ3SWa4KUlv
 github.com/charmbracelet/bubbletea v1.3.10/go.mod h1:ORQfo0fk8U+po9VaNvnV95UPWA1BitP1E0N6xJPlHr4=
 github.com/charmbracelet/colorprofile v0.4.1 h1:a1lO03qTrSIRaK8c3JRxJDZOvhvIeSco3ej+ngLk1kk=
 github.com/charmbracelet/colorprofile v0.4.1/go.mod h1:U1d9Dljmdf9DLegaJ0nGZNJvoXAhayhmidOdcBwAvKk=
+github.com/charmbracelet/harmonica v0.2.0 h1:8NxJWRWg/bzKqqEaaeFNipOu77YR5t8aSwG4pgaUBiQ=
+github.com/charmbracelet/harmonica v0.2.0/go.mod h1:KSri/1RMQOZLbw7AHqgcBycp8pgJnQMYYT8QZRqZ1Ao=
 github.com/charmbracelet/lipgloss v1.1.0 h1:vYXsiLHVkK7fp74RkV7b2kq9+zDLoEU4MZoFqR/noCY=
 github.com/charmbracelet/lipgloss v1.1.0/go.mod h1:/6Q8FR2o+kj8rz4Dq0zQc3vYf7X+B0binUUBwA0aL30=
 github.com/charmbracelet/x/ansi v0.11.3 h1:6DcVaqWI82BBVM/atTyq6yBoRLZFBsnoDoX9GCu2YOI=
@@ -20,6 +22,8 @@ github.com/charmbracelet/x/term v0.2.2 h1:xVRT/S2ZcKdhhOuSP4t5cLi5o+JxklsoEObBSg
 github.com/charmbracelet/x/term v0.2.2/go.mod h1:kF8CY5RddLWrsgVwpw4kAa6TESp6EB5y3uxGLeCqzAI=
 github.com/clipperhouse/displaywidth v0.6.1 h1:/zMlAezfDzT2xy6acHBzwIfyu2ic0hgkT83UX5EY2gY=
 github.com/clipperhouse/displaywidth v0.6.1/go.mod h1:R+kHuzaYWFkTm7xoMmK1lFydbci4X2CicfbGstSGg0o=
+github.com/clipperhouse/displaywidth v0.6.2 h1:ZDpTkFfpHOKte4RG5O/BOyf3ysnvFswpyYrV7z2uAKo=
+github.com/clipperhouse/displaywidth v0.6.2/go.mod h1:R+kHuzaYWFkTm7xoMmK1lFydbci4X2CicfbGstSGg0o=
 github.com/clipperhouse/stringish v0.1.1 h1:+NSqMOr3GR6k1FdRhhnXrLfztGzuG+VuFDfatpWHKCs=
 github.com/clipperhouse/stringish v0.1.1/go.mod h1:v/WhFtE1q0ovMta2+m+UbpZ+2/HEXNWYXQgCt4hdOzA=
 github.com/clipperhouse/uax29/v2 v2.3.0 h1:SNdx9DVUqMoBuBoW3iLOj4FQv3dN5mDtuqwuhIGpJy4=
@@ -40,16 +44,10 @@ github.com/halsten-dev/bubblehelp v1.0.2 h1:FiNgy+37cIiDkUOaUK1ShCzPYbhJ7ksff7w3
 github.com/halsten-dev/bubblehelp v1.0.2/go.mod h1:tIMQHQB2dkLJ7wgdURUs118NO2kG1tstbRVsmjI2P9A=
 github.com/halsten-dev/lokyn v1.0.0 h1:T4XGe2N9kQyjv+hRD/G9Clo5luhFzBosrZcqDFytW3M=
 github.com/halsten-dev/lokyn v1.0.0/go.mod h1:qGTNdCXIBmFcpP7puv/fEdrjZhAI16DV4v9N9OE2QOw=
-github.com/halsten-dev/orvyn v0.0.0-20251210205429-f9fed2400db9 h1:slAUkbnyBR4jTeEkI5yPeBYau9f3mibAeqzcyi6jz38=
-github.com/halsten-dev/orvyn v0.0.0-20251210205429-f9fed2400db9/go.mod h1:lnx6Nw2Xx0LSJhXP0xAgrAGcc9geePsMebsTjr28jv0=
-github.com/halsten-dev/orvyn v0.0.0-20251213225002-96272fccb9d2 h1:osblU+Lg9HN2ApZQ0IhzZtkQavnmV1q7gg5sQVAIkBU=
-github.com/halsten-dev/orvyn v0.0.0-20251213225002-96272fccb9d2/go.mod h1:lnx6Nw2Xx0LSJhXP0xAgrAGcc9geePsMebsTjr28jv0=
-github.com/halsten-dev/orvyn v0.0.0-20251214094946-62290de8914f h1:yrEbMk5Ijo+VkgzHVtcyjAwHhzFR9qXhml5SDvikeQU=
-github.com/halsten-dev/orvyn v0.0.0-20251214094946-62290de8914f/go.mod h1:lnx6Nw2Xx0LSJhXP0xAgrAGcc9geePsMebsTjr28jv0=
-github.com/halsten-dev/orvyn v0.0.0-20251214110641-ccc7d2145556 h1:K97jMCYQQi7kdrP0tCfOqaVOy80eA/cKzDt0pRxfivM=
-github.com/halsten-dev/orvyn v0.0.0-20251214110641-ccc7d2145556/go.mod h1:lnx6Nw2Xx0LSJhXP0xAgrAGcc9geePsMebsTjr28jv0=
 github.com/halsten-dev/orvyn v0.0.0-20251214112213-9544e5eb33b5 h1:EGpwadbpnKyNa/8HfH1aoyYdsKfJqYmL3PdfF7s1CmA=
 github.com/halsten-dev/orvyn v0.0.0-20251214112213-9544e5eb33b5/go.mod h1:lnx6Nw2Xx0LSJhXP0xAgrAGcc9geePsMebsTjr28jv0=
+github.com/halsten-dev/orvyn v0.0.0-20251214165344-bfeaae1cd473 h1:SslaVFvpvqp7B4BxDML6TztuPSApFEqzBhsza0pFtlo=
+github.com/halsten-dev/orvyn v0.0.0-20251214165344-bfeaae1cd473/go.mod h1:Ou7zxeZj3cfzfXUZQP8M2mhLV9aRRbMRywIgpZnmlH4=
 github.com/jeandeaual/go-locale v0.0.0-20250612000132-0ef82f21eade h1:FmusiCI1wHw+XQbvL9M+1r/C3SPqKrmBaIOYwVfQoDE=
 github.com/jeandeaual/go-locale v0.0.0-20250612000132-0ef82f21eade/go.mod h1:ZDXo8KHryOWSIqnsb/CiDq7hQUYryCgdVnxbj8tDG7o=
 github.com/kr/pretty v0.3.1 h1:flRD4NNwYAUpkphVc1HcthR4KEIFJ65n8Mw5qdRn3LE=
