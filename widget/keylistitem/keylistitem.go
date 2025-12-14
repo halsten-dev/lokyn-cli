@@ -1,28 +1,32 @@
 package keylistitem
 
 import (
+	"lokyn-cli/engine"
+
 	"github.com/charmbracelet/lipgloss"
 	"github.com/halsten-dev/orvyn"
 	"github.com/halsten-dev/orvyn/theme"
-	"github.com/halsten-dev/orvyn/widget/list"
-	"lokyn-cli/engine"
+	"github.com/halsten-dev/orvyn/widget/widgetlist"
 )
 
 type Widget struct {
 	orvyn.BaseWidget
 	orvyn.BaseFocusable
 
-	data *engine.DiscoveredKey
+	data engine.DiscoveredKey
 
 	style lipgloss.Style
 }
 
-func Constructor(data *engine.DiscoveredKey) list.IListItem {
+func Constructor(data engine.DiscoveredKey) widgetlist.ListItem[engine.DiscoveredKey] {
 	w := new(Widget)
 
-	w.data = data
+	w.BaseWidget = orvyn.NewBaseWidget()
+	w.BaseFocusable = orvyn.NewBaseFocusable(w)
 
 	w.OnBlur()
+
+	w.UpdateData(data)
 
 	return w
 }
@@ -40,6 +44,14 @@ func (w *Widget) Render() string {
 	return w.style.
 		Width(size.Width).
 		Render(string(w.data.Key))
+}
+
+func (w *Widget) UpdateData(data engine.DiscoveredKey) {
+	w.data = data
+}
+
+func (w *Widget) GetData() engine.DiscoveredKey {
+	return w.data
 }
 
 func (w *Widget) OnFocus() {

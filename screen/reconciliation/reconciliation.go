@@ -16,20 +16,18 @@ import (
 	"github.com/halsten-dev/lokyn"
 	"github.com/halsten-dev/orvyn"
 	"github.com/halsten-dev/orvyn/layout"
-	"github.com/halsten-dev/orvyn/widget/list"
+	"github.com/halsten-dev/orvyn/widget/widgetlist"
 )
 
 type Screen struct {
 	discoveredKeyTitle *orvyn.SimpleRenderable
-	discoveredKeyList  *list.Widget[engine.DiscoveredKey]
+	discoveredKeyList  *widgetlist.Widget[engine.DiscoveredKey]
 
 	dataKeyTitle *orvyn.SimpleRenderable
-	dataKeyList  *list.Widget[engine.DiscoveredKey]
+	dataKeyList  *widgetlist.Widget[engine.DiscoveredKey]
 
 	help *help.Widget
 
-	discoveredKeys      engine.Keys
-	translationKeys     engine.Keys
 	alreadyExistingKeys []engine.Key
 	data                engine.KeyLangMap
 
@@ -44,27 +42,23 @@ func New() *Screen {
 	s := new(Screen)
 
 	s.discoveredKeyTitle = orvyn.NewSimpleRenderable(lokyn.L("New discovered keys"))
-	s.discoveredKeyList = list.New(keylistitem.Constructor)
+	s.discoveredKeyList = widgetlist.New(keylistitem.Constructor)
 
 	s.dataKeyTitle = orvyn.NewSimpleRenderable(lokyn.L("Unused keys"))
-	s.dataKeyList = list.New(keylistitem.Constructor)
+	s.dataKeyList = widgetlist.New(keylistitem.Constructor)
 
 	s.help = help.New()
 
 	discoveredListLayout := layout.NewMaxWidthVBoxFullLayout(
 		orvyn.NewSize(0, 0), 1,
-		[]orvyn.Renderable{
-			s.discoveredKeyTitle,
-			s.discoveredKeyList,
-		},
+		s.discoveredKeyTitle,
+		s.discoveredKeyList,
 	)
 
 	dataListLayout := layout.NewMaxWidthVBoxFullLayout(
 		orvyn.NewSize(0, 0), 1,
-		[]orvyn.Renderable{
-			s.dataKeyTitle,
-			s.dataKeyList,
-		},
+		s.dataKeyTitle,
+		s.dataKeyList,
 	)
 
 	s.focusManager = orvyn.NewFocusManager()
@@ -72,14 +66,12 @@ func New() *Screen {
 	s.focusManager.Add(s.dataKeyList)
 
 	s.layout = layout.NewMaxWidthVBoxFullLayout(orvyn.NewSize(0, 1),
-		0, []orvyn.Renderable{
-			layout.NewHBoxGrowFullHeightLayout(1, 0,
-				[]orvyn.Renderable{
-					discoveredListLayout,
-					dataListLayout,
-				}),
-			s.help,
-		},
+		0,
+		layout.NewHBoxGrowFullHeightLayout(1, 0,
+			discoveredListLayout,
+			dataListLayout,
+		),
+		s.help,
 	)
 
 	return s
@@ -94,13 +86,11 @@ func (s *Screen) OnEnter(i any) tea.Cmd {
 
 	s.project = project
 
-	keys, err := engine.DiscoverKeys()
+	discoveredKeys, err := engine.DiscoverKeys(project.LocationPath)
 
 	if err != nil {
 		panic(err)
 	}
-
-	s.discoveredKeys = keys
 
 	data, err := engine.ImportTranslations(&project)
 
@@ -110,12 +100,12 @@ func (s *Screen) OnEnter(i any) tea.Cmd {
 
 	s.data = data
 
-	s.translationKeys = make(engine.Keys, 0)
+	translationKeys := make(engine.DiscoveredKeys, 0)
 
 	firstLang := project.ManagedLanguages[0]
 
 	for k, v := range data {
-		s.translationKeys = append(s.translationKeys, engine.DiscoveredKey{
+		translationKeys = append(translationKeys, engine.DiscoveredKey{
 			Key:      k,
 			IsPlural: v[firstLang].IsPlural,
 		})
@@ -123,8 +113,8 @@ func (s *Screen) OnEnter(i any) tea.Cmd {
 
 	s.compareKeys()
 
-	s.discoveredKeyList.SetItems(s.discoveredKeys)
-	s.dataKeyList.SetItems(s.translationKeys)
+	s.discoveredKeyList.SetItems(discoveredKeys)
+	s.dataKeyList.SetItems(translationKeys)
 
 	s.focusManager.Focus(0)
 	s.discoveredKeyList.FocusFirst()
@@ -143,13 +133,26 @@ func (s *Screen) OnExit() any {
 }
 
 func (s *Screen) Update(msg tea.Msg) tea.Cmd {
-	switch msg := msg.(type) {
-	case tea.KeyMsg:
-		switch {
-		case key.Matches(msg, keybind.Enter):
-			s.mergeData()
 
-			return orvyn.SwitchScreen(screen.IDTranslation)
+	if s.discoveredKeyList.FilterState() != widgetlist.Filtering &&
+		s.dataKeyList.FilterState() != widgetlist.Filtering {
+		switch msg := msg.(type) {
+		case tea.KeyMsg:
+			switch {
+			case key.Matches(msg, keybind.Enter):
+				s.mergeData()
+
+				return orvyn.SwitchScreen(screen.IDTranslation)
+			case key.Matches(msg, keybind.DKey):
+				switch {
+				case s.discoveredKeyList.IsFocused():
+					s.discoveredKeyList.RemoveItem(s.discoveredKeyList.GetGlobalIndex())
+					return nil
+				case s.dataKeyList.IsFocused():
+					s.dataKeyList.RemoveItem(s.dataKeyList.GetGlobalIndex())
+					return nil
+				}
+			}
 		}
 	}
 
@@ -167,47 +170,47 @@ func (s *Screen) compareKeys() {
 
 	s.alreadyExistingKeys = make([]engine.Key, 0)
 
-	for _, v := range s.translationKeys {
-		foundIndex = findInKeyList(v.Key, &s.discoveredKeys)
+	translationKeys := engine.DiscoveredKeys(s.dataKeyList.GetItems())
+	discoveredKeys := engine.DiscoveredKeys(s.discoveredKeyList.GetItems())
 
-		if foundIndex == -1 {
+	for _, v := range translationKeys {
+		if !discoveredKeys.ContainsKey(v.Key) {
 			continue
 		}
 
 		s.alreadyExistingKeys = append(s.alreadyExistingKeys, v.Key)
 	}
 
-	for i := len(s.discoveredKeys) - 1; i >= 0; i-- {
-		foundIndex = findInKeyList(s.discoveredKeys[i].Key, &s.translationKeys)
-
-		if foundIndex == -1 {
+	for i := len(discoveredKeys) - 1; i >= 0; i-- {
+		if !translationKeys.ContainsKey(discoveredKeys[i].Key) {
 			continue
 		}
 
-		s.discoveredKeys = helper.SliceRemove(s.discoveredKeys, i)
+		discoveredKeys = helper.SliceRemove(discoveredKeys, i)
 	}
 
 	for _, k := range s.alreadyExistingKeys {
-		foundIndex = findInKeyList(k, &s.translationKeys)
+		foundIndex = translationKeys.KeyIndex(k)
 
 		if foundIndex == -1 {
 			continue
 		}
 
-		s.translationKeys = helper.SliceRemove(s.translationKeys, foundIndex)
+		translationKeys = helper.SliceRemove(translationKeys, foundIndex)
 	}
+
+	s.dataKeyList.SetItems(translationKeys)
+	s.discoveredKeyList.SetItems(discoveredKeys)
 }
 
 // mergeData merges remaining elements of both discovered and translations lists into KeyLangMap.
 func (s *Screen) mergeData() {
 	// Mashup the both list into the data KeyLangMap.
-
-	var foundIndex int
+	translationKeys := engine.DiscoveredKeys(s.dataKeyList.GetItems())
+	discoveredKeys := engine.DiscoveredKeys(s.discoveredKeyList.GetItems())
 
 	for k := range s.data {
-		foundIndex = findInKeyList(k, &s.translationKeys)
-
-		if foundIndex >= 0 {
+		if translationKeys.ContainsKey(k) {
 			continue
 		}
 
@@ -218,7 +221,7 @@ func (s *Screen) mergeData() {
 		delete(s.data, k)
 	}
 
-	for _, v := range s.discoveredKeys {
+	for _, v := range discoveredKeys {
 		_, ok := s.data[v.Key]
 
 		if ok {
@@ -239,7 +242,7 @@ func (s *Screen) mergeData() {
 	}
 }
 
-func findInKeyList(key engine.Key, keyList *engine.Keys) int {
+func findInKeyList(key engine.Key, keyList *[]engine.DiscoveredKey) int {
 	for i, k := range *keyList {
 		if k.Key == key {
 			return i

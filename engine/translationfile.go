@@ -80,7 +80,7 @@ func importAllTranslationFiles(project Project) (LangKeyMap, error) {
 	langKeyMap = make(LangKeyMap)
 
 	for _, lang := range project.ManagedLanguages {
-		translations, err := importTranslationFile(project.ExportDir, lang)
+		translations, err := importTranslationFile(path.Join(project.LocationPath, project.ExportDir), lang)
 
 		if err != nil {
 			return nil, err

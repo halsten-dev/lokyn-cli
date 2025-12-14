@@ -17,14 +17,14 @@ import (
 	"github.com/halsten-dev/lokyn"
 	"github.com/halsten-dev/orvyn"
 	"github.com/halsten-dev/orvyn/layout"
-	"github.com/halsten-dev/orvyn/widget/list"
 	"github.com/halsten-dev/orvyn/widget/statusmessage"
+	"github.com/halsten-dev/orvyn/widget/widgetlist"
 )
 
 type Screen struct {
 	title *orvyn.SimpleRenderable
 
-	keyList *list.Widget[string]
+	keyList *widgetlist.Widget[string]
 	keyEdit *keyedit.Widget
 
 	statusMessage *statusmessage.Widget
@@ -35,7 +35,6 @@ type Screen struct {
 
 	layout *layout.CenterLayout
 
-	keys    []string
 	data    engine.KeyLangMap
 	project engine.Project
 }
@@ -46,7 +45,7 @@ func New() *Screen {
 	s.title = orvyn.NewSimpleRenderable(lokyn.L("Translation"))
 	s.title.SizeConstraint = true
 
-	s.keyList = list.New(list.SimpleListItemConstructor)
+	s.keyList = widgetlist.New(widgetlist.SimpleListItemConstructor)
 	s.keyList.CursorMovedCallback = s.keyListCursorMoved
 
 	s.keyEdit = keyedit.New()
@@ -59,21 +58,19 @@ func New() *Screen {
 	s.focusManager.Add(s.keyList)
 	s.focusManager.Add(s.keyEdit)
 
+	keyLayout := []layout.FixedRatioRenderable{
+		layout.NewFixedRatioRenderable(0.30, s.keyList),
+		layout.NewFixedRatioRenderable(0.70, s.keyEdit),
+	}
+
 	s.layout = layout.NewCenterLayout(
 		layout.NewMaxWidthVBoxFullLayout(
-			orvyn.NewSize(0, 1),
-			0,
-			[]orvyn.Renderable{
-				layout.NewHBoxFixedRatioLayout(
-					0, 2, 0,
-					[]layout.FixedRatioRenderable{
-						layout.NewFixedRatioRenderable(0.30, s.keyList),
-						layout.NewFixedRatioRenderable(0.70, s.keyEdit),
-					},
-				),
-				s.statusMessage,
-				s.help,
-			},
+			orvyn.NewSize(0, 1), 0,
+			layout.NewHBoxFixedRatioLayout(
+				0, 2, 0, keyLayout...,
+			),
+			s.statusMessage,
+			s.help,
 		),
 	)
 
@@ -83,6 +80,8 @@ func New() *Screen {
 func (s *Screen) OnEnter(i any) tea.Cmd {
 	s.data = make(engine.KeyLangMap)
 
+	s.statusMessage.Reset()
+
 	data, ok := i.(engine.TranslationData)
 
 	if !ok {
@@ -91,15 +90,15 @@ func (s *Screen) OnEnter(i any) tea.Cmd {
 
 	s.project = data.Project
 	s.data = data.Data
-	s.keys = make([]string, 0)
+	keys := make([]string, 0)
 
 	for k := range s.data {
-		s.keys = append(s.keys, string(k))
+		keys = append(keys, string(k))
 	}
 
 	s.keyEdit.InitTranslations(data.Project)
 
-	s.updateKeyList()
+	s.updateKeyList(keys)
 
 	s.focusManager.Focus(0)
 	s.keyList.FocusFirst()
@@ -118,14 +117,16 @@ func (s *Screen) OnExit() any {
 }
 
 func (s *Screen) Update(msg tea.Msg) tea.Cmd {
-	if !s.keyEdit.IsInputting() {
+	if !s.keyEdit.IsInputting() &&
+		s.keyList.FilterState() != widgetlist.Filtering {
 		switch msg := msg.(type) {
 		case tea.KeyMsg:
+			s.statusMessage.Reset()
 			switch {
 			case key.Matches(msg, keybind.TKey):
 				s.translateAll()
 
-			case key.Matches(msg, keybind.KKey):
+			case key.Matches(msg, keybind.CKey):
 				s.getCurrentKey()
 
 			case key.Matches(msg, keybind.XKey):
@@ -142,7 +143,7 @@ func (s *Screen) Update(msg tea.Msg) tea.Cmd {
 					statusmessage.SuccessMessage)
 
 			case key.Matches(msg, keybind.Esc):
-				if s.keyList.FilterState() == list.Unfiltered {
+				if s.keyList.FilterState() == widgetlist.Unfiltered {
 					return orvyn.SwitchScreen(screen.IDProjectLoading)
 				}
 			}
@@ -166,8 +167,10 @@ func (s *Screen) keyListCursorMoved(index int) {
 		return
 	}
 
+	key := s.keyList.GetItem(index)
+
 	s.keyEdit.SetTranslations(
-		s.data[engine.Key(s.keys[index])])
+		s.data[engine.Key(key)])
 }
 
 func (s *Screen) updateData() {
@@ -182,12 +185,12 @@ func (s *Screen) updateData() {
 	}
 }
 
-func (s *Screen) updateKeyList() {
-	slices.SortFunc(s.keys, func(a, b string) int {
+func (s *Screen) updateKeyList(keys []string) {
+	slices.SortFunc(keys, func(a, b string) int {
 		return strings.Compare(strings.ToLower(a), strings.ToLower(b))
 	})
 
-	s.keyList.SetItems(s.keys)
+	s.keyList.SetItems(keys)
 }
 
 func (s *Screen) translateAll() {
@@ -196,8 +199,10 @@ func (s *Screen) translateAll() {
 
 	s.updateData()
 
+	key := s.keyList.GetSelectedItem()
+
 	mainLang := s.project.ManagedLanguages[0]
-	currentKey := engine.Key(s.keys[s.keyList.GetGlobalIndex()])
+	currentKey := engine.Key(key)
 
 	mainLangTrans := s.data[currentKey][mainLang]
 
@@ -242,7 +247,8 @@ func (s *Screen) translateAll() {
 
 func (s *Screen) getCurrentKey() {
 	mainLang := s.project.ManagedLanguages[0]
-	currentKey := engine.Key(s.keys[s.keyList.GetGlobalIndex()])
+	key := s.keyList.GetSelectedItem()
+	currentKey := engine.Key(key)
 
 	mainLangTrans := s.data[currentKey][mainLang]
 

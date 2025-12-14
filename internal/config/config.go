@@ -2,10 +2,11 @@ package config
 
 import (
 	"errors"
-	"github.com/spf13/viper"
 	"log"
 	"os"
 	"path/filepath"
+
+	"github.com/spf13/viper"
 )
 
 const (
@@ -23,7 +24,7 @@ func Init() {
 		log.Panic("Failed to get user config dir")
 	}
 
-	configPath = filepath.Join(cfgDir, "lokyn_tui")
+	configPath = filepath.Join(cfgDir, "lokyn-cli")
 
 	err = os.MkdirAll(configPath, os.ModePerm)
 
@@ -38,7 +39,7 @@ func Init() {
 	viper.SetConfigName("lokyn")
 	viper.SetConfigType("toml")
 
-	viper.AddConfigPath(filepath.Join(cfgDir, "lokyn_tui"))
+	viper.AddConfigPath(filepath.Join(cfgDir, "lokyn-cli"))
 
 	err = viper.ReadInConfig() // Find and read the config file
 	if err != nil {            // Handle errors reading the config file

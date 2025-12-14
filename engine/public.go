@@ -12,26 +12,26 @@ import (
 
 // DiscoverProject is the function that allows to explore the current project root,
 // find the .lokyn folder if existing and load the project.
-func DiscoverProject() (Project, error) {
+func DiscoverProject(path string) (Project, error) {
 	var project Project
 
-	err := discoverProject(&project, "./")
+	err := discoverProject(&project, path)
 
 	return project, err
 }
 
 // DiscoverKeys is the function that allows to explore the current project root,
 // find every go files and analyse them to find all the Lokyn keys.
-func DiscoverKeys() (Keys, error) {
-	var keys Keys
+func DiscoverKeys(path string) (DiscoveredKeys, error) {
+	var keys DiscoveredKeys
 
-	err := discoverDirectory(&keys, "./")
+	err := discoverDirectory(&keys, path)
 
 	return keys, err
 }
 
 // ProjectNew creates a new project and returns it
-func ProjectNew(exportPath string, languages []string) Project {
+func ProjectNew(path, exportPath string, languages []string) Project {
 	langs := make([]Lang, len(languages))
 
 	project := Project{}
@@ -40,6 +40,7 @@ func ProjectNew(exportPath string, languages []string) Project {
 		langs[i] = Lang(l)
 	}
 
+	project.LocationPath = path
 	project.ExportDir = exportPath
 	project.ManagedLanguages = langs
 
@@ -47,7 +48,7 @@ func ProjectNew(exportPath string, languages []string) Project {
 }
 
 func ProjectSave(project *Project) error {
-	projectPath := path.Join(".", PROJECT_DIR_NAME)
+	projectPath := path.Join(project.LocationPath, PROJECT_DIR_NAME)
 
 	err := os.MkdirAll(projectPath, 0777)
 
@@ -85,7 +86,7 @@ func ExportAllTranslations(project *Project, data KeyLangMap) error {
 	exportData := ConvertKeyLangMap(data)
 
 	for _, l := range project.ManagedLanguages {
-		filePath = path.Join(project.ExportDir, fmt.Sprintf("%s.json", l))
+		filePath = path.Join(project.LocationPath, project.ExportDir, fmt.Sprintf("%s.json", l))
 		err = os.Remove(filePath)
 
 		if err != nil {

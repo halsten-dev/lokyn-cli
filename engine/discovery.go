@@ -8,8 +8,6 @@ import (
 	"path/filepath"
 	"regexp"
 	"strings"
-
-	"github.com/halsten-dev/lokyn"
 )
 
 func discoverProject(project *Project, directory string) error {
@@ -61,7 +59,7 @@ func discoverProject(project *Project, directory string) error {
 }
 
 // discoverDirectory is a recursive function that go in the whole hierarchy.
-func discoverDirectory(keys *Keys, directory string) error {
+func discoverDirectory(keys *DiscoveredKeys, directory string) error {
 	// Get all files of the folder.
 	// If it's a folder > call this function again
 	// -> Else, if it's a go file -> discoverSourceFile
@@ -100,7 +98,7 @@ func discoverDirectory(keys *Keys, directory string) error {
 }
 
 // discoverSourceFile is the function that read a source file and extract all found Lokyn keys.
-func discoverSourceFile(keys *Keys, filePath string) {
+func discoverSourceFile(keys *DiscoveredKeys, filePath string) {
 	// First, determine if the lokyn package uses an alias.
 	// Read line by line and fetch : lokyn.L / lokyn.P
 	// Get the key between double quotes, if there is no double quotes. Key are invalid.
@@ -142,7 +140,7 @@ func findImport(content []byte) (bool, string) {
 	return true, ""
 }
 
-func findCalls(keys *Keys, content []byte, prefix string) {
+func findCalls(keys *DiscoveredKeys, content []byte, prefix string) {
 	var pCounter int
 	var bKey strings.Builder
 
@@ -162,14 +160,12 @@ func findCalls(keys *Keys, content []byte, prefix string) {
 
 		index := matchesIndex[i][1]
 
+		// To help extract the key and to avoid "in string" parenthesis
 		isInString := false
 		lastStringRune := rune(0)
 		sCounter := 0
 
 		bKey.Reset()
-
-		// discover key
-		_ = lokyn.L("sdoifjs(aodfdsijfoaisdjf" + "dsifjosadif)dsifjosa")
 
 		for {
 			r := rune(content[index])
@@ -218,7 +214,7 @@ func findCalls(keys *Keys, content []byte, prefix string) {
 			key.Err = errors.New("Key is variable, need manual matching")
 		}
 
-		if !keys.containsKey(key.Key) {
+		if !keys.ContainsKey(key.Key) {
 			*keys = append(*keys, key)
 		}
 	}

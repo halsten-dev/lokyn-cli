@@ -11,8 +11,8 @@ import (
 	"github.com/halsten-dev/orvyn"
 	"github.com/halsten-dev/orvyn/layout"
 	"github.com/halsten-dev/orvyn/theme"
-	"github.com/halsten-dev/orvyn/widget/list"
 	"github.com/halsten-dev/orvyn/widget/textinput"
+	"github.com/halsten-dev/orvyn/widget/widgetlist"
 )
 
 type Widget struct {
@@ -25,7 +25,7 @@ type Widget struct {
 	tiOneValue   *textinput.Widget
 	tiOtherValue *textinput.Widget
 
-	data *engine.Translation
+	data engine.Translation
 
 	style lipgloss.Style
 
@@ -34,24 +34,15 @@ type Widget struct {
 	layout *layout.VBoxFullLayout
 }
 
-func Constructor(data *engine.Translation) list.IListItem {
+func Constructor(data engine.Translation) widgetlist.ListItem[engine.Translation] {
 	w := new(Widget)
 
-	w.data = data
+	w.BaseWidget = orvyn.NewBaseWidget()
+	w.BaseFocusable = orvyn.NewBaseFocusable(w)
 
 	w.srLanguage = orvyn.NewSimpleRenderable(string(data.Lang))
 	w.tiOneValue = textinput.New()
 	w.tiOtherValue = textinput.New()
-
-	w.tiOneValue.SetValue(data.OneValue)
-
-	if data.IsPlural {
-		w.tiOtherValue.SetValue(data.OtherValue)
-		w.tiOtherValue.SetActive(true)
-	} else {
-		w.tiOtherValue.SetValue("")
-		w.tiOtherValue.SetActive(false)
-	}
 
 	w.focusManager = orvyn.NewFocusManager()
 	w.focusManager.Add(w.tiOneValue)
@@ -59,14 +50,14 @@ func Constructor(data *engine.Translation) list.IListItem {
 
 	w.layout = layout.NewMaxWidthVBoxFullLayout(
 		orvyn.NewSize(0, 0), 1,
-		[]orvyn.Renderable{
-			w.srLanguage,
-			w.tiOneValue,
-			w.tiOtherValue,
-		},
+		w.srLanguage,
+		w.tiOneValue,
+		w.tiOtherValue,
 	)
 
 	w.OnBlur()
+
+	w.UpdateData(data)
 
 	return w
 }
@@ -94,6 +85,24 @@ func (w *Widget) Update(msg tea.Msg) tea.Cmd {
 	w.data.OtherValue = w.tiOtherValue.Value()
 
 	return cmd
+}
+
+func (w *Widget) UpdateData(data engine.Translation) {
+	w.data = data
+
+	w.tiOneValue.SetValue(data.OneValue)
+
+	if data.IsPlural {
+		w.tiOtherValue.SetValue(data.OtherValue)
+		w.tiOtherValue.SetActive(true)
+	} else {
+		w.tiOtherValue.SetValue("")
+		w.tiOtherValue.SetActive(false)
+	}
+}
+
+func (w *Widget) GetData() engine.Translation {
+	return w.data
 }
 
 func (w *Widget) Render() string {

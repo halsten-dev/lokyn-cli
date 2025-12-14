@@ -9,14 +9,14 @@ import (
 	"github.com/halsten-dev/bubblehelp"
 	"github.com/halsten-dev/orvyn"
 	"github.com/halsten-dev/orvyn/layout"
-	"github.com/halsten-dev/orvyn/widget/list"
+	"github.com/halsten-dev/orvyn/widget/widgetlist"
 )
 
 type Widget struct {
 	orvyn.BaseWidget
 	orvyn.BaseFocusable
 
-	translationFieldsList *list.Widget[engine.Translation]
+	translationFieldsList *widgetlist.Widget[engine.Translation]
 
 	translations []engine.Translation
 
@@ -30,7 +30,7 @@ func New() *Widget {
 
 	w.BaseWidget = orvyn.NewBaseWidget()
 
-	w.translationFieldsList = list.New(keyeditlistitem.Constructor)
+	w.translationFieldsList = widgetlist.New(keyeditlistitem.Constructor)
 	w.translationFieldsList.SetFilterable(false)
 
 	w.layout = layout.NewCenterLayout(

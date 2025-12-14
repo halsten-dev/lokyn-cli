@@ -10,6 +10,7 @@ import (
 	"lokyn-cli/screen/projectloading"
 	"lokyn-cli/screen/reconciliation"
 	"lokyn-cli/screen/translation"
+	"os"
 
 	"github.com/halsten-dev/orvyn"
 	"github.com/halsten-dev/orvyn/theme"
@@ -77,11 +78,18 @@ func main() {
 	registerKeymapContexts()
 
 	// Screens registering
-	orvyn.RegisterScreen(screen.IDProjectLoading, projectloading.New())
+	projectLoadingScreen := projectloading.New()
+	orvyn.RegisterScreen(screen.IDProjectLoading, projectLoadingScreen)
 	orvyn.RegisterScreen(screen.IDTranslation, translation.New())
 	orvyn.RegisterScreen(screen.IDReconciliation, reconciliation.New())
 
-	orvyn.SwitchScreen(screen.IDProjectLoading)
+	path := ""
+
+	if len(os.Args) > 1 {
+		path = os.Args[1]
+	}
+
+	projectLoadingScreen.SetCurrentDir(path)
 
 	p := tea.NewProgram(&App{}, tea.WithAltScreen())
 
@@ -104,8 +112,8 @@ func registerKeymapContexts() {
 	keymapContext = bubblehelp.NewKeymap(2)
 	keymapContext.NewKeyBinding(keybind.TKey, true)
 	keymapContext.SetHelpDesc(keybind.TKey, lokyn.L("translate"))
-	keymapContext.NewKeyBinding(keybind.KKey, true)
-	keymapContext.SetHelpDesc(keybind.KKey, lokyn.L("copy key"))
+	keymapContext.NewKeyBinding(keybind.CKey, true)
+	keymapContext.SetHelpDesc(keybind.CKey, lokyn.L("copy key"))
 	keymapContext.NewKeyBinding(keybind.EKey, true)
 	keymapContext.SetHelpDesc(keybind.EKey, lokyn.L("edit value"))
 	keymapContext.NewKeyBinding(keybind.XKey, true)

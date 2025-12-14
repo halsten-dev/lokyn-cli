@@ -9,9 +9,9 @@ const (
 type Key string
 type Lang string
 
-type Keys []DiscoveredKey
+type DiscoveredKeys []DiscoveredKey
 
-func (k Keys) containsKey(key Key) bool {
+func (k DiscoveredKeys) ContainsKey(key Key) bool {
 	for _, v := range k {
 		if v.Key == key {
 			return true
@@ -19,6 +19,16 @@ func (k Keys) containsKey(key Key) bool {
 	}
 
 	return false
+}
+
+func (k DiscoveredKeys) KeyIndex(key Key) int {
+	for i, v := range k {
+		if v.Key == key {
+			return i
+		}
+	}
+
+	return -1
 }
 
 type DiscoveredKey struct {
@@ -34,7 +44,8 @@ type DiscoveredKey struct {
 }
 
 type Project struct {
-	ExportDir string
+	LocationPath string
+	ExportDir    string
 	// MainLanguage     Lang
 	ManagedLanguages []Lang
 }

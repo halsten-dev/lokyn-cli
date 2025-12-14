@@ -79,16 +79,14 @@ func New() *Screen {
 
 	s.layout = layout.NewCenterLayout(
 		layout.NewDefinedWidthVerticalLayout(30, 100, 10,
-			[]orvyn.Renderable{
-				s.labelExportPath,
-				s.exportPath,
-				orvyn.VGap,
-				s.labelLanguages,
-				s.languages,
-				orvyn.VGap,
-				s.statusMessage,
-				s.help,
-			},
+			s.labelExportPath,
+			s.exportPath,
+			orvyn.VGap,
+			s.labelLanguages,
+			s.languages,
+			orvyn.VGap,
+			s.statusMessage,
+			s.help,
 		),
 	)
 
@@ -100,7 +98,7 @@ func (s *Screen) OnEnter(i any) tea.Cmd {
 
 	bubblehelp.SwitchContext(keybind.ContextProjectLoading)
 
-	s.project, err = engine.DiscoverProject()
+	s.project, err = engine.DiscoverProject(s.currentDir)
 
 	if err != nil {
 		s.project = engine.Project{}
@@ -158,6 +156,13 @@ func (s *Screen) Render() orvyn.Layout {
 	return s.layout
 }
 
+func (s *Screen) SetCurrentDir(path string) {
+	if path != "" {
+		s.currentDir = path
+		return
+	}
+}
+
 func (s *Screen) projectCreation() bool {
 	var exportPath string
 	var languages []string
@@ -177,7 +182,7 @@ func (s *Screen) projectCreation() bool {
 		return false
 	}
 
-	s.project = engine.ProjectNew(exportPath, languages)
+	s.project = engine.ProjectNew(s.currentDir, exportPath, languages)
 
 	err := engine.ProjectSave(&s.project)
 
