@@ -111,10 +111,10 @@ func (s *Screen) OnEnter(i any) tea.Cmd {
 		})
 	}
 
-	s.compareKeys()
-
 	s.discoveredKeyList.SetItems(discoveredKeys)
 	s.dataKeyList.SetItems(translationKeys)
+
+	s.compareKeys()
 
 	s.focusManager.Focus(0)
 	s.discoveredKeyList.FocusFirst()
@@ -240,14 +240,4 @@ func (s *Screen) mergeData() {
 			}
 		}
 	}
-}
-
-func findInKeyList(key engine.Key, keyList *[]engine.DiscoveredKey) int {
-	for i, k := range *keyList {
-		if k.Key == key {
-			return i
-		}
-	}
-
-	return -1
 }
