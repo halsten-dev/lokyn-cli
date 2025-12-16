@@ -2,6 +2,7 @@ package main
 
 import (
 	"embed"
+	"fmt"
 	"log"
 	"lokyn-cli/internal/config"
 	"lokyn-cli/internal/keybind"
@@ -87,6 +88,9 @@ func main() {
 
 	if len(os.Args) > 1 {
 		path = os.Args[1]
+	} else {
+		fmt.Println("Please specify a folder")
+		return
 	}
 
 	projectLoadingScreen.SetCurrentDir(path)

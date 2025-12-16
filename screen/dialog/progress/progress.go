@@ -12,7 +12,9 @@ import (
 type Screen struct {
 	progressBar *progressbar.Widget
 
-	percent float64
+	maxSteps int
+	steps    int
+	percent  float64
 
 	layout *layout.CenterLayout
 
@@ -48,6 +50,9 @@ func (s *Screen) Update(msg tea.Msg) tea.Cmd {
 			return nil
 		}
 
+		s.progressBar.MaxValue = s.maxSteps
+		s.progressBar.CurrentValue = s.steps
+
 		cmd := s.progressBar.SetPercent(s.percent)
 
 		s.tickTag++
@@ -65,14 +70,16 @@ func (s *Screen) Render() orvyn.Layout {
 	return s.layout
 }
 
-func (s *Screen) UpdateProgress(step, maxSteps int) {
+func (s *Screen) UpdateProgress(steps, maxSteps int) {
 	var percent float64
 
 	if maxSteps > 0 {
-		percent = float64(100*step/maxSteps) / 100
+		percent = float64(100*steps/maxSteps) / 100
 	} else {
 		percent = 0
 	}
 
+	s.maxSteps = maxSteps
+	s.steps = steps
 	s.percent = percent
 }
