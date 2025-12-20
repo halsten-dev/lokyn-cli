@@ -11,6 +11,7 @@ import (
 	"lokyn-cli/widget/keyedit"
 	"slices"
 	"strings"
+	"time"
 
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
@@ -296,6 +297,9 @@ func (s *Screen) translateAllKeys() tea.Cmd {
 			s.data[key][mainLang] = trans
 
 			s.translateAllLangs(key)
+
+			// Delay to avoid too much call to DeepL API
+			time.Sleep(800 * time.Millisecond)
 		}
 	}(s.progressDialog)
 

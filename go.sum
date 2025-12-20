@@ -20,8 +20,6 @@ github.com/charmbracelet/x/cellbuf v0.0.14 h1:iUEMryGyFTelKW3THW4+FfPgi4fkmKnnaL
 github.com/charmbracelet/x/cellbuf v0.0.14/go.mod h1:P447lJl49ywBbil/KjCk2HexGh4tEY9LH0/1QrZZ9rA=
 github.com/charmbracelet/x/term v0.2.2 h1:xVRT/S2ZcKdhhOuSP4t5cLi5o+JxklsoEObBSgfgZRk=
 github.com/charmbracelet/x/term v0.2.2/go.mod h1:kF8CY5RddLWrsgVwpw4kAa6TESp6EB5y3uxGLeCqzAI=
-github.com/clipperhouse/displaywidth v0.6.1 h1:/zMlAezfDzT2xy6acHBzwIfyu2ic0hgkT83UX5EY2gY=
-github.com/clipperhouse/displaywidth v0.6.1/go.mod h1:R+kHuzaYWFkTm7xoMmK1lFydbci4X2CicfbGstSGg0o=
 github.com/clipperhouse/displaywidth v0.6.2 h1:ZDpTkFfpHOKte4RG5O/BOyf3ysnvFswpyYrV7z2uAKo=
 github.com/clipperhouse/displaywidth v0.6.2/go.mod h1:R+kHuzaYWFkTm7xoMmK1lFydbci4X2CicfbGstSGg0o=
 github.com/clipperhouse/stringish v0.1.1 h1:+NSqMOr3GR6k1FdRhhnXrLfztGzuG+VuFDfatpWHKCs=
@@ -44,8 +42,6 @@ github.com/halsten-dev/bubblehelp v1.0.2 h1:FiNgy+37cIiDkUOaUK1ShCzPYbhJ7ksff7w3
 github.com/halsten-dev/bubblehelp v1.0.2/go.mod h1:tIMQHQB2dkLJ7wgdURUs118NO2kG1tstbRVsmjI2P9A=
 github.com/halsten-dev/lokyn v1.0.0 h1:T4XGe2N9kQyjv+hRD/G9Clo5luhFzBosrZcqDFytW3M=
 github.com/halsten-dev/lokyn v1.0.0/go.mod h1:qGTNdCXIBmFcpP7puv/fEdrjZhAI16DV4v9N9OE2QOw=
-github.com/halsten-dev/orvyn v0.0.0-20251214112213-9544e5eb33b5 h1:EGpwadbpnKyNa/8HfH1aoyYdsKfJqYmL3PdfF7s1CmA=
-github.com/halsten-dev/orvyn v0.0.0-20251214112213-9544e5eb33b5/go.mod h1:lnx6Nw2Xx0LSJhXP0xAgrAGcc9geePsMebsTjr28jv0=
 github.com/halsten-dev/orvyn v0.0.0-20251214165344-bfeaae1cd473 h1:SslaVFvpvqp7B4BxDML6TztuPSApFEqzBhsza0pFtlo=
 github.com/halsten-dev/orvyn v0.0.0-20251214165344-bfeaae1cd473/go.mod h1:Ou7zxeZj3cfzfXUZQP8M2mhLV9aRRbMRywIgpZnmlH4=
 github.com/jeandeaual/go-locale v0.0.0-20250612000132-0ef82f21eade h1:FmusiCI1wHw+XQbvL9M+1r/C3SPqKrmBaIOYwVfQoDE=
