@@ -56,17 +56,17 @@ func New() *Screen {
 
 	keymapContext := bubblehelp.NewKeymap(2)
 	keymapContext.NewKeyBinding(keybind.Enter, true)
-	keymapContext.SetHelpDesc(keybind.Enter, "create project")
+	keymapContext.SetHelpDesc(keybind.Enter, lokyn.L("create project"))
 	keymapContext.NewKeyBinding(keybind.Esc, true)
-	keymapContext.SetHelpDesc(keybind.Esc, "cancel")
+	keymapContext.SetHelpDesc(keybind.Esc, lokyn.L("cancel"))
 
 	bubblehelp.RegisterContext(keybind.ContextProjectLoading, keymapContext)
 
 	s.labelExportPath = label.New(
-		fmt.Sprintf("translation export path (relative to %s)", s.currentDir))
+		fmt.Sprintf(lokyn.L("translation export path (relative to %s)"), s.currentDir))
 	s.exportPath = textinput.New()
 
-	s.labelLanguages = label.New("wanted languages (separated by a coma)")
+	s.labelLanguages = label.New(lokyn.L("wanted languages (separated by a coma)"))
 	s.languages = textinput.New()
 
 	s.help = help.New()
@@ -107,7 +107,7 @@ func (s *Screen) OnEnter(i any) tea.Cmd {
 	}
 
 	orvyn.OpenDialog("AskProjectCreation", dialog.YesNoPopup(
-		fmt.Sprintf("Do you want to create a lokyn project in : %s",
+		fmt.Sprintf(lokyn.L("Do you want to create a lokyn project in : %s"),
 			s.currentDir)), nil)
 
 	s.focusManager.Focus(0)

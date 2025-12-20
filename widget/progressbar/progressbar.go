@@ -52,16 +52,6 @@ func (w *Widget) Update(msg tea.Msg) tea.Cmd {
 
 func (w *Widget) Render() string {
 	var b strings.Builder
-	// var percent float64
-
-	// size := w.GetContentSize()
-
-	// if w.MaxValue > 0 {
-	// 	percent = float64(100*w.CurrentValue/w.MaxValue) / 100
-	// } else {
-	// 	percent = 0
-	// }
-
 	if len(w.title) > 0 {
 		b.WriteString(w.TitleStyle.Render(
 			fmt.Sprintf("%s (%d/%d)",
@@ -70,9 +60,6 @@ func (w *Widget) Render() string {
 		b.WriteString(w.TitleStyle.Render(fmt.Sprintf("(%d/%d)",
 			w.CurrentValue, w.MaxValue)))
 	}
-	// b.WriteString(strings.Repeat(
-	// 	fmt.Sprintf("\n%s", w.Model.View()), size.Height-1),
-	// )
 	b.WriteString(fmt.Sprintf("\n%s", w.Model.View()))
 
 	return b.String()

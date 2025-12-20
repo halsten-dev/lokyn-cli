@@ -8,6 +8,8 @@ import (
 	"path/filepath"
 	"regexp"
 	"strings"
+
+	"github.com/halsten-dev/lokyn"
 )
 
 func discoverProject(project *Project, directory string) error {
@@ -211,7 +213,7 @@ func findCalls(keys *DiscoveredKeys, content []byte, prefix string) {
 			key.Err = nil
 		} else {
 			key.Key = Key(strKey)
-			key.Err = errors.New("Key is variable, need manual matching")
+			key.Err = errors.New(lokyn.L("Key is variable, need manual matching"))
 		}
 
 		if !keys.ContainsKey(key.Key) {

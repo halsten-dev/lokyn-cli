@@ -77,7 +77,7 @@ func Init() {
 		key.WithHelp("enter", lokyn.L("submit")))
 	Space = key.NewBinding(
 		key.WithKeys(" "),
-		key.WithHelp(lokyn.L("space"), lokyn.L("claim")))
+		key.WithHelp(lokyn.L("space"), "space key"))
 	Esc = key.NewBinding(
 		key.WithKeys("esc"),
 		key.WithHelp("esc", lokyn.L("back")))

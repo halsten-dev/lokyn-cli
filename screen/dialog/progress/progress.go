@@ -4,6 +4,7 @@ import (
 	"lokyn-cli/widget/progressbar"
 
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/halsten-dev/lokyn"
 	"github.com/halsten-dev/orvyn"
 	"github.com/halsten-dev/orvyn/layout"
 	"github.com/halsten-dev/orvyn/theme"
@@ -23,7 +24,7 @@ type Screen struct {
 
 func New() *Screen {
 	s := &Screen{
-		progressBar: progressbar.New("On going", orvyn.GetTheme().Color(theme.NormalFontColorID)),
+		progressBar: progressbar.New(lokyn.L("On going"), orvyn.GetTheme().Color(theme.NormalFontColorID)),
 	}
 
 	s.layout = layout.NewCenterLayout(
