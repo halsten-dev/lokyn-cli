@@ -24,8 +24,6 @@ import (
 )
 
 type Screen struct {
-	title *orvyn.SimpleRenderable
-
 	keyList *widgetlist.Widget[string]
 	keyEdit *keyedit.Widget
 
@@ -45,9 +43,6 @@ type Screen struct {
 
 func New() *Screen {
 	s := new(Screen)
-
-	s.title = orvyn.NewSimpleRenderable(lokyn.L("Translation"))
-	s.title.SizeConstraint = true
 
 	s.keyList = widgetlist.New(widgetlist.SimpleListItemConstructor)
 	s.keyList.CursorMovedCallback = s.keyListCursorMoved

@@ -12,10 +12,12 @@ import (
 
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
 	"github.com/halsten-dev/bubblehelp"
 	"github.com/halsten-dev/lokyn"
 	"github.com/halsten-dev/orvyn"
 	"github.com/halsten-dev/orvyn/layout"
+	"github.com/halsten-dev/orvyn/theme"
 	"github.com/halsten-dev/orvyn/widget/widgetlist"
 )
 
@@ -25,6 +27,8 @@ type Screen struct {
 
 	dataKeyTitle *orvyn.SimpleRenderable
 	dataKeyList  *widgetlist.Widget[engine.DiscoveredKey]
+
+	explanationText *orvyn.SimpleRenderable
 
 	help *help.Widget
 
@@ -41,11 +45,17 @@ type Screen struct {
 func New() *Screen {
 	s := new(Screen)
 
+	t := orvyn.GetTheme()
+
 	s.discoveredKeyTitle = orvyn.NewSimpleRenderable(lokyn.L("New discovered keys"))
 	s.discoveredKeyList = widgetlist.New(keylistitem.Constructor)
 
 	s.dataKeyTitle = orvyn.NewSimpleRenderable(lokyn.L("Unused keys"))
 	s.dataKeyList = widgetlist.New(keylistitem.Constructor)
+
+	s.explanationText = orvyn.NewSimpleRenderable(lokyn.L("All keys visible in the those two lists, will be present for export in the final translation file."))
+	s.explanationText.SizeConstraint = true
+	s.explanationText.Style = t.Style(theme.TitleStyleID).Align(lipgloss.Center)
 
 	s.help = help.New()
 
@@ -71,6 +81,8 @@ func New() *Screen {
 			discoveredListLayout,
 			dataListLayout,
 		),
+		s.explanationText,
+		orvyn.VGap,
 		s.help,
 	)
 

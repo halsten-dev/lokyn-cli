@@ -41,7 +41,7 @@ func main() {
 	err = lokyn.AddTranslationFS(translations, "translations")
 
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 
 	lokyn.SetLanguage(viper.GetString("language"))
