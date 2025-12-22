@@ -104,6 +104,10 @@ func main() {
 
 func registerKeymapContexts() {
 	keymapContext := bubblehelp.NewKeymap(2)
+	keymapContext.NewKeyBinding(keybind.AKey, true)
+	keymapContext.SetHelpDesc(keybind.AKey, lokyn.L("insert key"))
+	keymapContext.NewKeyBinding(keybind.DKey, true)
+	keymapContext.SetHelpDesc(keybind.DKey, lokyn.L("delete key"))
 	keymapContext.NewKeyBinding(keybind.Enter, true)
 	keymapContext.SetHelpDesc(keybind.Enter, lokyn.L("validate"))
 	keymapContext.NewKeyBinding(keybind.Tab, true)

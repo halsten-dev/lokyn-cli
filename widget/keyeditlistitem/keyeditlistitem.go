@@ -8,6 +8,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/halsten-dev/bubblehelp"
+	"github.com/halsten-dev/lokyn"
 	"github.com/halsten-dev/orvyn"
 	"github.com/halsten-dev/orvyn/layout"
 	"github.com/halsten-dev/orvyn/theme"
@@ -42,7 +43,9 @@ func Constructor(data engine.Translation) widgetlist.ListItem[engine.Translation
 
 	w.srLanguage = orvyn.NewSimpleRenderable(string(data.Lang))
 	w.tiOneValue = textinput.New()
+	w.tiOneValue.Placeholder = lokyn.L("One")
 	w.tiOtherValue = textinput.New()
+	w.tiOtherValue.Placeholder = lokyn.L("Multiple")
 
 	w.focusManager = orvyn.NewFocusManager()
 	w.focusManager.Add(w.tiOneValue)
@@ -93,9 +96,11 @@ func (w *Widget) UpdateData(data engine.Translation) {
 	w.tiOneValue.SetValue(data.OneValue)
 
 	if data.IsPlural {
+		w.tiOneValue.Placeholder = lokyn.L("One")
 		w.tiOtherValue.SetValue(data.OtherValue)
 		w.tiOtherValue.SetActive(true)
 	} else {
+		w.tiOneValue.Placeholder = lokyn.L("Value")
 		w.tiOtherValue.SetValue("")
 		w.tiOtherValue.SetActive(false)
 	}

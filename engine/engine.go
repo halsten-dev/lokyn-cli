@@ -41,6 +41,9 @@ type DiscoveredKey struct {
 
 	// IsPlural holds the fact that the key was used as a plural key.
 	IsPlural bool
+
+	// IsCreatedByUser holds the fact that this key was created by the user in the reconciliation screen.
+	IsCreatedByUser bool
 }
 
 type Project struct {

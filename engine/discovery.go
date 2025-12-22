@@ -185,6 +185,10 @@ func findCalls(keys *DiscoveredKeys, content []byte, prefix string) {
 				}
 			}
 
+			if r == ',' && !isInString && callType == "P" {
+				break
+			}
+
 			if r == '(' && !isInString {
 				pCounter++
 			}

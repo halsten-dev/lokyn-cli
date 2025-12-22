@@ -28,6 +28,10 @@ func importTranslationFile(exportDir string, lang Lang) (map[Key]Translation, er
 		return nil, nil
 	}
 
+	if len(content) == 0 {
+		return nil, nil
+	}
+
 	err = json.Unmarshal(content, &importedTranslations)
 
 	if err != nil {

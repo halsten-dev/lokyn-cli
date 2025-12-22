@@ -49,6 +49,7 @@ func New() *Screen {
 
 	s.discoveredKeyTitle = orvyn.NewSimpleRenderable(lokyn.L("New discovered keys"))
 	s.discoveredKeyList = widgetlist.New(keylistitem.Constructor)
+	s.discoveredKeyList.AutoFocusNewItem = true
 
 	s.dataKeyTitle = orvyn.NewSimpleRenderable(lokyn.L("Unused keys"))
 	s.dataKeyList = widgetlist.New(keylistitem.Constructor)
@@ -145,9 +146,9 @@ func (s *Screen) OnExit() any {
 }
 
 func (s *Screen) Update(msg tea.Msg) tea.Cmd {
-
 	if s.discoveredKeyList.FilterState() != widgetlist.Filtering &&
-		s.dataKeyList.FilterState() != widgetlist.Filtering {
+		s.dataKeyList.FilterState() != widgetlist.Filtering &&
+		!s.discoveredKeyList.IsInputting() {
 		switch msg := msg.(type) {
 		case tea.KeyMsg:
 			switch {
@@ -155,6 +156,18 @@ func (s *Screen) Update(msg tea.Msg) tea.Cmd {
 				s.mergeData()
 
 				return orvyn.SwitchScreen(screen.IDTranslation)
+
+			case key.Matches(msg, keybind.AKey):
+				s.discoveredKeyList.InsertItem(s.discoveredKeyList.GetGlobalIndex(),
+					engine.DiscoveredKey{
+						IsCreatedByUser: true,
+						Key:             "",
+						IsPlural:        false,
+						Err:             nil,
+					})
+
+				return nil
+
 			case key.Matches(msg, keybind.DKey):
 				switch {
 				case s.discoveredKeyList.IsFocused():
@@ -237,6 +250,11 @@ func (s *Screen) mergeData() {
 		_, ok := s.data[v.Key]
 
 		if ok {
+			continue
+		}
+
+		if v.Err != nil {
+			delete(s.data, v.Key)
 			continue
 		}
 

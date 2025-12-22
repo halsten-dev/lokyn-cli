@@ -62,8 +62,7 @@ func New() *Screen {
 
 	bubblehelp.RegisterContext(keybind.ContextProjectLoading, keymapContext)
 
-	s.labelExportPath = label.New(
-		fmt.Sprintf(lokyn.L("translation export path (relative to %s)"), s.currentDir))
+	s.labelExportPath = label.New("")
 	s.exportPath = textinput.New()
 
 	s.labelLanguages = label.New(lokyn.L("wanted languages (separated by a coma)"))
@@ -97,6 +96,8 @@ func (s *Screen) OnEnter(i any) tea.Cmd {
 	var err error
 
 	bubblehelp.SwitchContext(keybind.ContextProjectLoading)
+
+	s.labelExportPath.SetValue(fmt.Sprintf(lokyn.L("translation export path (relative to %s)"), s.currentDir))
 
 	s.project, err = engine.DiscoverProject(s.currentDir)
 
