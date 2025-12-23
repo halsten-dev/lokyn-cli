@@ -149,12 +149,16 @@ func (w *Widget) GetEnterInputKeybind() *key.Binding {
 	return nil
 }
 
-func (w *Widget) OnEnterInput() {
+func (w *Widget) OnEnterInput() tea.Cmd {
 	w.focusManager.FocusFirst()
+
+	return w.tiKeyName.Init()
 }
 
-func (w *Widget) OnExitInput() {
+func (w *Widget) OnExitInput() tea.Cmd {
 	w.focusManager.BlurCurrent()
+
+	return nil
 }
 
 func (w *Widget) FilterValue() string {

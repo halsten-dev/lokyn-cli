@@ -129,15 +129,19 @@ func (w *Widget) GetEnterInputKeybind() *key.Binding {
 	return &keybind.EKey
 }
 
-func (w *Widget) OnEnterInput() {
+func (w *Widget) OnEnterInput() tea.Cmd {
 	w.focusManager.Focus(0)
 	bubblehelp.SwitchContext(keybind.ContextInputMode)
+
+	return w.tiOneValue.Init()
 }
 
-func (w *Widget) OnExitInput() {
+func (w *Widget) OnExitInput() tea.Cmd {
 	w.focusManager.BlurCurrent()
 	bubblehelp.SwitchContext(keybind.ContextTranslation)
 	bubblehelp.SetKeybindVisible(keybind.EKey, true)
+
+	return nil
 }
 
 func (w *Widget) FilterValue() string {

@@ -71,10 +71,6 @@ func (w *Widget) IsInputting() bool {
 	return w.translationFieldsList.IsInputting()
 }
 
-func (w *Widget) OnEnterInput() {}
-
-func (w *Widget) OnExitInput() {}
-
 func (w *Widget) SetTranslations(langMap map[engine.Lang]engine.Translation) {
 	if langMap == nil {
 		w.translationFieldsList.SetItems(make([]engine.Translation, 0))
