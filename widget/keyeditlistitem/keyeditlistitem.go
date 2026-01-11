@@ -5,6 +5,7 @@ import (
 	"lokyn-cli/internal/keybind"
 
 	"github.com/charmbracelet/bubbles/key"
+	bti "github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/halsten-dev/bubblehelp"
@@ -133,7 +134,7 @@ func (w *Widget) OnEnterInput() tea.Cmd {
 	w.focusManager.Focus(0)
 	bubblehelp.SwitchContext(keybind.ContextInputMode)
 
-	return w.tiOneValue.Init()
+	return bti.Blink
 }
 
 func (w *Widget) OnExitInput() tea.Cmd {
