@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/url"
 	"strconv"
+	"strings"
 )
 
 var (
@@ -30,12 +31,20 @@ func Get(textToTranslate, sourceLangCode, targetLangCode string) (string, error)
 	apiKey := deeplAPIKey
 
 	data := url.Values{}
-	data.Set("auth_key", apiKey)
 	data.Set("source_lang", sourceLangCode)
 	data.Set("target_lang", targetLangCode)
 	data.Set("text", textToTranslate)
 
-	resp, err := http.PostForm(translateAPIURL, data)
+	req, err := http.NewRequest("POST", translateAPIURL, strings.NewReader(data.Encode()))
+	if err != nil {
+		return "", err
+	}
+
+	req.Header.Set("Authorization", "DeepL-Auth-Key "+apiKey)
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
 	if err != nil {
 		return "", err
 	}
