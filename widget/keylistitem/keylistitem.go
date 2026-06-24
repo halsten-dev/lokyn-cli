@@ -7,7 +7,6 @@ import (
 
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/lipgloss"
 	"github.com/halsten-dev/lokyn"
 	"github.com/halsten-dev/orvyn"
 	"github.com/halsten-dev/orvyn/layout"
@@ -74,11 +73,7 @@ func Constructor(data engine.DiscoveredKey) widgetlist.ListItem[engine.Discovere
 }
 
 func (w *Widget) Resize(size orvyn.Size) {
-	size.Height = lipgloss.Height(w.value)
-
-	if w.data.IsCreatedByUser {
-		size.Height = 3
-	}
+	size.Height = 5
 
 	w.BaseWidget.Resize(size)
 
