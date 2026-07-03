@@ -6,6 +6,7 @@ import (
 	"lokyn-cli/internal/keybind"
 	"lokyn-cli/internal/translate"
 	"lokyn-cli/screen"
+	"lokyn-cli/screen/dialog/popup"
 	"lokyn-cli/screen/dialog/progress"
 	"lokyn-cli/widget/help"
 	"lokyn-cli/widget/keyedit"
@@ -128,7 +129,7 @@ func (s *Screen) Update(msg tea.Msg) tea.Cmd {
 				s.translateAll()
 
 			case key.Matches(msg, keybind.ShiftTKey):
-				return s.translateAllKeys()
+				s.translateAllKeys()
 
 			case key.Matches(msg, keybind.CKey):
 				s.getCurrentKey()
@@ -151,14 +152,53 @@ func (s *Screen) Update(msg tea.Msg) tea.Cmd {
 					return orvyn.SwitchScreen(screen.IDProjectLoading)
 				}
 			}
-		}
-	}
 
-	switch msg := msg.(type) {
-	case orvyn.DialogExitMsg:
-		switch msg.DialogID {
-		case "progressBar":
-			s.keyEdit.SetTranslations(s.data[engine.Key(s.keyList.GetSelectedItem())])
+		case orvyn.DialogExitMsg:
+			switch msg.DialogID {
+			case "progressBar":
+				s.keyEdit.SetTranslations(s.data[engine.Key(s.keyList.GetSelectedItem())])
+
+			case "replaceConfirm":
+				replaceExistingTrans := false
+
+				val := msg.Param.(uint)
+				switch val {
+				case 0:
+					return nil
+				case 1:
+					replaceExistingTrans = true
+				}
+
+				mainLang := s.project.ManagedLanguages[0]
+
+				go func(dial *progress.Screen) {
+					count := 0
+					maxSteps := len(s.data)
+
+					dial.UpdateProgress(count, maxSteps)
+
+					for _, k := range s.data {
+						count++
+						dial.UpdateProgress(count, maxSteps)
+
+						key := k[mainLang].Key
+						trans := s.data[key][mainLang]
+
+						if trans.OneValue == "" {
+							trans.OneValue = string(trans.Key)
+						}
+
+						s.data[key][mainLang] = trans
+
+						s.translateAllLangs(key, replaceExistingTrans)
+
+						// Delay to avoid too much call to DeepL API
+						time.Sleep(800 * time.Millisecond)
+					}
+				}(s.progressDialog)
+
+				return orvyn.OpenDialog("progressBar", s.progressDialog, nil)
+			}
 		}
 	}
 
@@ -205,7 +245,7 @@ func (s *Screen) updateKeyList(keys []string) {
 	s.keyList.SetItems(keys)
 }
 
-func (s *Screen) translateAllLangs(key engine.Key) {
+func (s *Screen) translateAllLangs(key engine.Key, replaceTrans bool) {
 	var err error
 	var trans engine.Translation
 
@@ -231,20 +271,25 @@ func (s *Screen) translateAllLangs(key engine.Key) {
 			}
 		}
 
-		trans.OneValue, err = translate.Get(mainLangTrans.OneValue, string(mainLang), string(l))
-
-		if err != nil {
-			s.statusMessage.SetError(err)
-			return
-		}
-
-		if trans.IsPlural {
-			trans.OtherValue, err = translate.Get(mainLangTrans.OtherValue, string(mainLang), string(l))
+		if replaceTrans || trans.OneValue == "" {
+			trans.OneValue, err = translate.Get(mainLangTrans.OneValue, string(mainLang), string(l))
 
 			if err != nil {
 				s.statusMessage.SetError(err)
 				return
 			}
+		}
+
+		if trans.IsPlural {
+			if replaceTrans || trans.OtherValue == "" {
+				trans.OtherValue, err = translate.Get(mainLangTrans.OtherValue, string(mainLang), string(l))
+
+				if err != nil {
+					s.statusMessage.SetError(err)
+					return
+				}
+			}
+
 		}
 
 		s.data[currentKey][l] = trans
@@ -256,49 +301,36 @@ func (s *Screen) translateAll() {
 
 	key := engine.Key(s.keyList.GetSelectedItem())
 
-	s.translateAllLangs(key)
+	s.translateAllLangs(key, true)
 
 	s.keyEdit.SetTranslations(s.data[key])
 }
 
-func (s *Screen) translateAllKeys() tea.Cmd {
-	// Loop through every keys
+func (s *Screen) translateAllKeys() {
+	options := []popup.Option{
+		{
+			Keybind: keybind.YKey,
+			Text:    lokyn.L("Yes"),
+			Value:   1,
+		},
+		{
+			Keybind: keybind.NKey,
+			Text:    lokyn.L("No"),
+			Value:   2,
+		},
+		{
+			Keybind: keybind.Esc,
+			Text:    lokyn.L("Cancel"),
+			Value:   0,
+		},
+	}
 
-	mainLang := s.project.ManagedLanguages[0]
+	config := popup.Config{
+		Message: lokyn.L("Do you want to override existing translations ?"),
+		Options: options,
+	}
 
-	go func(dial *progress.Screen) {
-		count := 0
-		maxSteps := len(s.data)
-
-		dial.UpdateProgress(count, maxSteps)
-
-		for _, k := range s.data {
-			count++
-			dial.UpdateProgress(count, maxSteps)
-
-			key := k[mainLang].Key
-			trans := s.data[key][mainLang]
-
-			if trans.IsPlural {
-				continue
-			}
-
-			if trans.OneValue != "" {
-				continue
-			}
-
-			trans.OneValue = string(trans.Key)
-
-			s.data[key][mainLang] = trans
-
-			s.translateAllLangs(key)
-
-			// Delay to avoid too much call to DeepL API
-			time.Sleep(800 * time.Millisecond)
-		}
-	}(s.progressDialog)
-
-	return orvyn.OpenDialog("progressBar", s.progressDialog, nil)
+	orvyn.OpenDialog("replaceConfirm", popup.New(config), nil)
 }
 
 func (s *Screen) getCurrentKey() {

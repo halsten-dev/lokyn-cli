@@ -51,6 +51,7 @@ type Project struct {
 	ExportDir    string
 	// MainLanguage     Lang
 	ManagedLanguages []Lang
+	// TODO : Add Variables/Keys Linking table
 }
 
 type LangKeyMap map[Lang]map[Key]Translation
