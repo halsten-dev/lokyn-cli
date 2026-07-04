@@ -64,6 +64,8 @@ github.com/halsten-dev/orvyn v0.0.0-20251223114823-77b228b26365 h1:pyGPI0KtxuiXb
 github.com/halsten-dev/orvyn v0.0.0-20251223114823-77b228b26365/go.mod h1:Ou7zxeZj3cfzfXUZQP8M2mhLV9aRRbMRywIgpZnmlH4=
 github.com/halsten-dev/orvyn v0.0.0-20260619222834-922647680343 h1:WsZvMpKRdHYVFPNkfV36bVPJCqfZFcNU/8Cr/lhCH+4=
 github.com/halsten-dev/orvyn v0.0.0-20260619222834-922647680343/go.mod h1:ywQTQudr6ZQHggklB+4vVgOqI/WfqUVyU44tQcv7xp8=
+github.com/halsten-dev/orvyn v0.0.0-20260628064511-c463bfb1d1ea h1:DGGJ0i3Ds46EOQ8YjmskFsyfLiWKpKTbuzg7svHNm00=
+github.com/halsten-dev/orvyn v0.0.0-20260628064511-c463bfb1d1ea/go.mod h1:ywQTQudr6ZQHggklB+4vVgOqI/WfqUVyU44tQcv7xp8=
 github.com/jeandeaual/go-locale v0.0.0-20250612000132-0ef82f21eade h1:FmusiCI1wHw+XQbvL9M+1r/C3SPqKrmBaIOYwVfQoDE=
 github.com/jeandeaual/go-locale v0.0.0-20250612000132-0ef82f21eade/go.mod h1:ZDXo8KHryOWSIqnsb/CiDq7hQUYryCgdVnxbj8tDG7o=
 github.com/kr/pretty v0.3.1 h1:flRD4NNwYAUpkphVc1HcthR4KEIFJ65n8Mw5qdRn3LE=

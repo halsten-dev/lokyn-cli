@@ -22,12 +22,13 @@ func DiscoverProject(path string) (Project, error) {
 
 // DiscoverKeys is the function that allows to explore the current project root,
 // find every go files and analyse them to find all the Lokyn keys.
-func DiscoverKeys(path string) (DiscoveredKeys, error) {
+func DiscoverKeys(path string) (DiscoveredKeys, DiscoveredVars, error) {
 	var keys DiscoveredKeys
+	var vars DiscoveredVars
 
-	err := discoverDirectory(&keys, path)
+	err := discoverDirectory(&keys, &vars, path)
 
-	return keys, err
+	return keys, vars, err
 }
 
 // ProjectNew creates a new project and returns it

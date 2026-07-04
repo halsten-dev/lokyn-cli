@@ -83,7 +83,6 @@ func New() *Screen {
 			dataListLayout,
 		),
 		s.explanationText,
-		orvyn.VGap,
 		s.help,
 	)
 
@@ -99,7 +98,7 @@ func (s *Screen) OnEnter(i any) tea.Cmd {
 
 	s.project = project
 
-	discoveredKeys, err := engine.DiscoverKeys(project.LocationPath)
+	discoveredKeys, _, err := engine.DiscoverKeys(project.LocationPath)
 
 	if err != nil {
 		panic(err)

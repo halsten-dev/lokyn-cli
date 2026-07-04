@@ -7,6 +7,8 @@ const (
 )
 
 type Key string
+type Keys []Key
+type Var string
 type Lang string
 
 type DiscoveredKeys []DiscoveredKey
@@ -31,6 +33,28 @@ func (k DiscoveredKeys) KeyIndex(key Key) int {
 	return -1
 }
 
+type DiscoveredVars []DiscoveredVar
+
+func (v DiscoveredVars) ContainsVar(varName Var) bool {
+	for _, v := range v {
+		if v.Var == varName {
+			return true
+		}
+	}
+
+	return false
+}
+
+func (v DiscoveredVars) VarIndex(varName Var) int {
+	for i, v := range v {
+		if v.Var == varName {
+			return i
+		}
+	}
+
+	return -1
+}
+
 type DiscoveredKey struct {
 	// Key holds the key found in source files of the project.
 	Key Key
@@ -46,12 +70,22 @@ type DiscoveredKey struct {
 	IsCreatedByUser bool
 }
 
+type DiscoveredVar struct {
+	// Var represent the variable name
+	Var Var
+
+	// Err represents the current status of this variable
+	Err error
+}
+
 type Project struct {
 	LocationPath string
 	ExportDir    string
 	// MainLanguage     Lang
 	ManagedLanguages []Lang
-	// TODO : Add Variables/Keys Linking table
+
+	// VarsKeysLink holds every know variables and their linked keys.
+	VarsKeysLink map[Var]Keys
 }
 
 type LangKeyMap map[Lang]map[Key]Translation

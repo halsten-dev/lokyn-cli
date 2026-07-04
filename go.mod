@@ -8,7 +8,7 @@ require (
 	github.com/charmbracelet/lipgloss v1.1.0
 	github.com/halsten-dev/bubblehelp v1.0.2
 	github.com/halsten-dev/lokyn v1.0.1
-	github.com/halsten-dev/orvyn v0.0.0-20260619222834-922647680343
+	github.com/halsten-dev/orvyn v0.0.0-20260628064511-c463bfb1d1ea
 	github.com/spf13/viper v1.21.0
 )
 

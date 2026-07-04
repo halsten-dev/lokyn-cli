@@ -8,8 +8,6 @@ import (
 	"path/filepath"
 	"regexp"
 	"strings"
-
-	"github.com/halsten-dev/lokyn"
 )
 
 func discoverProject(project *Project, directory string) error {
@@ -61,7 +59,7 @@ func discoverProject(project *Project, directory string) error {
 }
 
 // discoverDirectory is a recursive function that go in the whole hierarchy.
-func discoverDirectory(keys *DiscoveredKeys, directory string) error {
+func discoverDirectory(keys *DiscoveredKeys, vars *DiscoveredVars, directory string) error {
 	// Get all files of the folder.
 	// If it's a folder > call this function again
 	// -> Else, if it's a go file -> discoverSourceFile
@@ -79,7 +77,7 @@ func discoverDirectory(keys *DiscoveredKeys, directory string) error {
 		}
 
 		if e.IsDir() {
-			err = discoverDirectory(keys, path.Join(directory, e.Name()))
+			err = discoverDirectory(keys, vars, path.Join(directory, e.Name()))
 
 			if err != nil {
 				return err
@@ -93,14 +91,14 @@ func discoverDirectory(keys *DiscoveredKeys, directory string) error {
 			continue
 		}
 
-		discoverSourceFile(keys, path.Join(directory, e.Name()))
+		discoverSourceFile(keys, vars, path.Join(directory, e.Name()))
 	}
 
 	return nil
 }
 
 // discoverSourceFile is the function that read a source file and extract all found Lokyn keys.
-func discoverSourceFile(keys *DiscoveredKeys, filePath string) {
+func discoverSourceFile(keys *DiscoveredKeys, vars *DiscoveredVars, filePath string) {
 	// First, determine if the lokyn package uses an alias.
 	// Read line by line and fetch : lokyn.L / lokyn.P
 	// Get the key between double quotes, if there is no double quotes. Key are invalid.
@@ -124,7 +122,7 @@ func discoverSourceFile(keys *DiscoveredKeys, filePath string) {
 		alias = "lokyn"
 	}
 
-	findCalls(keys, content, alias)
+	findCalls(keys, vars, content, alias)
 }
 
 var importPattern = regexp.MustCompile(`(?m)^\s*(?:(\w+)\s+)?"github\.com/halsten-dev/lokyn"`)
@@ -142,7 +140,7 @@ func findImport(content []byte) (bool, string) {
 	return true, ""
 }
 
-func findCalls(keys *DiscoveredKeys, content []byte, prefix string) {
+func findCalls(keys *DiscoveredKeys, vars *DiscoveredVars, content []byte, prefix string) {
 	var pCounter int
 	var bKey strings.Builder
 
@@ -208,20 +206,28 @@ func findCalls(keys *DiscoveredKeys, content []byte, prefix string) {
 
 		strKey := bKey.String()
 
-		key := DiscoveredKey{
-			IsPlural: callType == "P",
-		}
-
 		if (isSurroundedBy(strKey, `"`) || isSurroundedBy(strKey, "`")) && sCounter == 1 {
+
+			key := DiscoveredKey{
+				IsPlural: callType == "P",
+			}
+
 			key.Key = Key(strKey[1 : len(strKey)-1])
 			key.Err = nil
-		} else {
-			key.Key = Key(strKey)
-			key.Err = errors.New(lokyn.L("Key is variable, need manual matching"))
-		}
 
-		if !keys.ContainsKey(key.Key) {
-			*keys = append(*keys, key)
+			if !keys.ContainsKey(key.Key) {
+				*keys = append(*keys, key)
+			}
+
+		} else {
+			variable := DiscoveredVar{
+				Var: Var(strKey),
+				Err: nil,
+			}
+
+			if !vars.ContainsVar(variable.Var) {
+				*vars = append(*vars, variable)
+			}
 		}
 	}
 }

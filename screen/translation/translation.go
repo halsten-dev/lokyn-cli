@@ -10,6 +10,7 @@ import (
 	"lokyn-cli/screen/dialog/progress"
 	"lokyn-cli/widget/help"
 	"lokyn-cli/widget/keyedit"
+	"lokyn-cli/widget/truncatedkeylistitem"
 	"slices"
 	"strings"
 	"time"
@@ -25,7 +26,7 @@ import (
 )
 
 type Screen struct {
-	keyList *widgetlist.Widget[string]
+	keyList *widgetlist.Widget[engine.Key]
 	keyEdit *keyedit.Widget
 
 	statusMessage *statusmessage.Widget
@@ -45,7 +46,7 @@ type Screen struct {
 func New() *Screen {
 	s := new(Screen)
 
-	s.keyList = widgetlist.New(widgetlist.SimpleListItemConstructor)
+	s.keyList = widgetlist.New(truncatedkeylistitem.Constructor)
 	s.keyList.CursorMovedCallback = s.keyListCursorMoved
 
 	s.keyEdit = keyedit.New()
@@ -69,7 +70,7 @@ func New() *Screen {
 		layout.NewMaxWidthVBoxFullLayout(
 			orvyn.NewSize(0, 1), 0,
 			layout.NewHBoxFixedRatioLayout(
-				0, 2, 0, keyLayout...,
+				0, 0, 0, keyLayout...,
 			),
 			s.statusMessage,
 			s.help,
@@ -92,10 +93,10 @@ func (s *Screen) OnEnter(i any) tea.Cmd {
 
 	s.project = data.Project
 	s.data = data.Data
-	keys := make([]string, 0)
+	var keys engine.Keys
 
 	for k := range s.data {
-		keys = append(keys, string(k))
+		keys = append(keys, k)
 	}
 
 	s.keyEdit.InitTranslations(data.Project)
@@ -237,9 +238,9 @@ func (s *Screen) updateData() {
 	}
 }
 
-func (s *Screen) updateKeyList(keys []string) {
-	slices.SortFunc(keys, func(a, b string) int {
-		return strings.Compare(strings.ToLower(a), strings.ToLower(b))
+func (s *Screen) updateKeyList(keys engine.Keys) {
+	slices.SortFunc(keys, func(a, b engine.Key) int {
+		return strings.Compare(strings.ToLower(string(a)), strings.ToLower(string(b)))
 	})
 
 	s.keyList.SetItems(keys)
