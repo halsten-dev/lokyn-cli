@@ -125,7 +125,11 @@ func discoverSourceFile(keys *DiscoveredKeys, vars *DiscoveredVars, filePath str
 	findCalls(keys, vars, content, alias)
 }
 
-var importPattern = regexp.MustCompile(`(?m)^\s*(?:(\w+)\s+)?"github\.com/halsten-dev/lokyn"`)
+// The optional `import\s+` prefix handles single-line imports (e.g. templ's
+// generated files: `import "github.com/halsten-dev/lokyn"`); without it the
+// `import` keyword is captured as the package alias, so calls in those files
+// are searched as `import.L(` and silently missed.
+var importPattern = regexp.MustCompile(`(?m)^\s*(?:import\s+)?(?:(\w+)\s+)?"github\.com/halsten-dev/lokyn"`)
 
 func findImport(content []byte) (bool, string) {
 	matches := importPattern.FindSubmatch(content)
