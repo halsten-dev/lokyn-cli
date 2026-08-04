@@ -112,6 +112,8 @@ func ExportAllTranslations(project *Project, data KeyLangMap) error {
 				content.WriteString(",")
 			}
 
+			content.WriteString("\n\t")
+
 			// Marshal each key/value through encoding/json so quotes, backslashes,
 			// newlines, etc. in a translation are escaped. Interpolating them raw
 			// produced invalid JSON (e.g. a value containing " broke the file).
@@ -121,17 +123,21 @@ func ExportAllTranslations(project *Project, data KeyLangMap) error {
 			if t.IsPlural {
 				oneJSON, _ := json.Marshal(t.OneValue)
 				otherJSON, _ := json.Marshal(t.OtherValue)
-				content.WriteString(fmt.Sprintf(`%s:{"One":%s,"Other":%s}`,
+				content.WriteString(fmt.Sprintf("%s: {\n\t\t\"One\": %s,\n\t\t\"Other\": %s\n\t}",
 					keyJSON, oneJSON, otherJSON))
 			} else {
 				valueJSON, _ := json.Marshal(t.OneValue)
-				content.WriteString(fmt.Sprintf(`%s:%s`, keyJSON, valueJSON))
+				content.WriteString(fmt.Sprintf(`%s: %s`, keyJSON, valueJSON))
 			}
 
 			count++
 		}
 
-		content.WriteString("}")
+		if count > 0 {
+			content.WriteString("\n")
+		}
+
+		content.WriteString("}\n")
 
 		err = os.WriteFile(filePath, content.Bytes(), 0777)
 
