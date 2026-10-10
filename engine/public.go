@@ -6,18 +6,34 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"path/filepath"
 )
 
 // This file only contains the public API of the engine package.
 
 // DiscoverProject is the function that allows to explore the current project root,
-// find the .lokyn folder if existing and load the project.
-func DiscoverProject(path string) (Project, error) {
+// find the .lokyn folder if existing and load the project. The selected directory
+// is the project root; a stale LocationPath is updated in the saved project.
+func DiscoverProject(directory string) (Project, error) {
 	var project Project
 
-	err := discoverProject(&project, path)
+	root, err := filepath.Abs(directory)
+	if err != nil {
+		return project, err
+	}
 
-	return project, err
+	if err := discoverProject(&project, root); err != nil {
+		return project, err
+	}
+
+	if project.LocationPath != root {
+		project.LocationPath = root
+		if err := ProjectSave(&project); err != nil {
+			return project, fmt.Errorf("update project location: %w", err)
+		}
+	}
+
+	return project, nil
 }
 
 // DiscoverKeys is the function that allows to explore the current project root,
