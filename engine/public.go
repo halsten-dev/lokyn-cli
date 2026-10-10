@@ -2,6 +2,7 @@ package engine
 
 import (
 	"bytes"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"os"
@@ -126,17 +127,32 @@ func ExportAllTranslations(project *Project, data KeyLangMap) error {
 				content.WriteString(",")
 			}
 
+			content.WriteString("\n\t")
+
+			// Marshal each key/value through encoding/json so quotes, backslashes,
+			// newlines, etc. in a translation are escaped. Interpolating them raw
+			// produced invalid JSON (e.g. a value containing " broke the file).
+			// json.Marshal of a string never errors, so the errors are ignored.
+			keyJSON, _ := json.Marshal(string(k))
+
 			if t.IsPlural {
-				content.WriteString(fmt.Sprintf(`"%s":{"One":"%s", "Other":"%s"}`,
-					k, t.OneValue, t.OtherValue))
+				oneJSON, _ := json.Marshal(t.OneValue)
+				otherJSON, _ := json.Marshal(t.OtherValue)
+				content.WriteString(fmt.Sprintf("%s: {\n\t\t\"One\": %s,\n\t\t\"Other\": %s\n\t}",
+					keyJSON, oneJSON, otherJSON))
 			} else {
-				content.WriteString(fmt.Sprintf(`"%s":"%s"`, k, t.OneValue))
+				valueJSON, _ := json.Marshal(t.OneValue)
+				content.WriteString(fmt.Sprintf(`%s: %s`, keyJSON, valueJSON))
 			}
 
 			count++
 		}
 
-		content.WriteString("}")
+		if count > 0 {
+			content.WriteString("\n")
+		}
+
+		content.WriteString("}\n")
 
 		err = os.WriteFile(filePath, content.Bytes(), 0777)
 
