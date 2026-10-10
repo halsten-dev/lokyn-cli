@@ -2,6 +2,7 @@ package truncatedkeylistitem
 
 import (
 	"lokyn-cli/engine"
+	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/x/ansi"
@@ -40,7 +41,7 @@ func (w *Widget) Resize(size orvyn.Size) {
 
 func (w *Widget) refreshKeyName() {
 	width := w.GetContentSize().Width
-	value := string(w.data)
+	value := strings.NewReplacer("\n", " ", "\r", " ", "\t", " ").Replace(string(w.data))
 
 	if width > 0 {
 		value = ansi.Truncate(value, width, "…")
@@ -69,6 +70,8 @@ func (w *Widget) Render() string {
 	return w.GetStyle().
 		Width(contentSize.Width).
 		Height(contentSize.Height).
+		MaxWidth(w.GetSize().Width).
+		MaxHeight(w.GetSize().Height).
 		Render(w.renderValue)
 }
 

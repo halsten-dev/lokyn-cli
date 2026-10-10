@@ -8,6 +8,7 @@ import (
 	"lokyn-cli/screen"
 	"lokyn-cli/screen/dialog/popup"
 	"lokyn-cli/screen/dialog/progress"
+	"lokyn-cli/widget/compactlist"
 	"lokyn-cli/widget/help"
 	"lokyn-cli/widget/keyedit"
 	"lokyn-cli/widget/truncatedkeylistitem"
@@ -26,7 +27,7 @@ import (
 )
 
 type Screen struct {
-	keyList *widgetlist.Widget[engine.Key]
+	keyList *compactlist.Widget[engine.Key]
 	keyEdit *keyedit.Widget
 
 	statusMessage *statusmessage.Widget
@@ -46,7 +47,7 @@ type Screen struct {
 func New() *Screen {
 	s := new(Screen)
 
-	s.keyList = widgetlist.New(truncatedkeylistitem.Constructor)
+	s.keyList = compactlist.New(truncatedkeylistitem.Constructor)
 	s.keyList.CursorMovedCallback = s.keyListCursorMoved
 
 	s.keyEdit = keyedit.New()
@@ -215,12 +216,11 @@ func (s *Screen) Render() orvyn.Layout {
 func (s *Screen) keyListCursorMoved(index int) {
 	s.updateData()
 
-	if index == -1 {
+	key := s.keyList.GetItem(index)
+	if index < 0 || key == "" {
 		s.keyEdit.SetTranslations(nil)
 		return
 	}
-
-	key := s.keyList.GetItem(index)
 
 	s.keyEdit.SetTranslations(
 		s.data[engine.Key(key)])
@@ -230,7 +230,7 @@ func (s *Screen) updateData() {
 	translations := s.keyEdit.GetTranslations()
 
 	for _, t := range translations {
-		if t.Key == "" {
+		if t.Key == "" || s.data[t.Key] == nil {
 			continue
 		}
 
@@ -252,6 +252,9 @@ func (s *Screen) translateAllLangs(key engine.Key, replaceTrans bool) {
 
 	mainLang := s.project.ManagedLanguages[0]
 	currentKey := engine.Key(key)
+	if s.data[currentKey] == nil {
+		return
+	}
 
 	mainLangTrans := s.data[currentKey][mainLang]
 
@@ -308,6 +311,9 @@ func (s *Screen) translateAll() {
 }
 
 func (s *Screen) translateAllKeys() {
+	if len(s.data) == 0 {
+		return
+	}
 	options := []popup.Option{
 		{
 			Keybind: keybind.YKey,
@@ -338,6 +344,9 @@ func (s *Screen) getCurrentKey() {
 	mainLang := s.project.ManagedLanguages[0]
 	key := s.keyList.GetSelectedItem()
 	currentKey := engine.Key(key)
+	if s.data[currentKey] == nil {
+		return
+	}
 
 	mainLangTrans := s.data[currentKey][mainLang]
 

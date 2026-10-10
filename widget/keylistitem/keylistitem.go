@@ -4,9 +4,11 @@ import (
 	"fmt"
 	"lokyn-cli/engine"
 	"lokyn-cli/internal/keybind"
+	"strings"
 
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/x/ansi"
 	"github.com/halsten-dev/lokyn"
 	"github.com/halsten-dev/orvyn"
 	"github.com/halsten-dev/orvyn/layout"
@@ -98,10 +100,21 @@ func (w *Widget) Update(msg tea.Msg) tea.Cmd {
 func (w *Widget) Render() string {
 	contentSize := w.GetContentSize()
 
+	var content string
+	if w.data.IsCreatedByUser {
+		content = w.layout.Render()
+	} else {
+		// Long keys must not wrap beyond the fixed list-item height and push
+		// subsequent rows/pagination outside the terminal.
+		value := strings.NewReplacer("\n", " ", "\r", " ", "\t", " ").Replace(w.value)
+		content = ansi.Truncate(value, contentSize.Width, "…")
+	}
 	return w.GetStyle().
 		Width(contentSize.Width).
 		Height(contentSize.Height).
-		Render(w.layout.Render())
+		MaxWidth(w.GetSize().Width).
+		MaxHeight(w.GetSize().Height).
+		Render(content)
 }
 
 func (w *Widget) UpdateData(data engine.DiscoveredKey) {
@@ -147,7 +160,8 @@ func (w *Widget) GetEnterInputKeybind() *key.Binding {
 func (w *Widget) OnEnterInput() tea.Cmd {
 	w.focusManager.FocusFirst()
 
-	return w.tiKeyName.Init()
+	// Re-entering edit mode must not erase an already-created key.
+	return w.tiKeyName.Model.Focus()
 }
 
 func (w *Widget) OnExitInput() tea.Cmd {

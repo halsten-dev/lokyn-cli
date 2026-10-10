@@ -70,13 +70,25 @@ type DiscoveredKey struct {
 	IsCreatedByUser bool
 }
 
+// DiscoveredVar identifies an unresolved expression, not an exported key.
+// Var is a stable scope-aware ID; Expression is its human-readable source text.
 type DiscoveredVar struct {
-	// Var represent the variable name
-	Var Var
-
-	// Err represents the current status of this variable
-	Err error
+	Var        Var
+	Expression string
+	File       string // Relative to the scanned project root.
+	Scope      string
+	Line       int // Display only; never part of the persisted identity.
+	IsPlural   bool
+	Err        error // Conflicting singular/plural uses or invalid discovery.
 }
+
+type VariableStatus string
+
+const (
+	VariableUnresolved VariableStatus = "unresolved"
+	VariableLinked     VariableStatus = "linked"
+	VariableIgnored    VariableStatus = "ignored"
+)
 
 type Project struct {
 	LocationPath string
@@ -86,6 +98,8 @@ type Project struct {
 
 	// VarsKeysLink holds every know variables and their linked keys.
 	VarsKeysLink map[Var]Keys
+	// Ignoring must be explicit; an empty link list is unresolved.
+	VarsIgnored map[Var]bool
 }
 
 type LangKeyMap map[Lang]map[Key]Translation
