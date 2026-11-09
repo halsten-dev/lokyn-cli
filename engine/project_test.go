@@ -9,7 +9,7 @@ import (
 
 func TestDiscoverProjectUsesSelectedDirectory(t *testing.T) {
 	oldRoot := t.TempDir()
-	for _, savedRoot := range []string{oldRoot, filepath.Join(oldRoot, "missing"), ""} {
+	for _, savedRoot := range []string{oldRoot, filepath.Join(oldRoot, "missing")} {
 		t.Run(savedRoot, func(t *testing.T) {
 			root := t.TempDir()
 			original := ProjectNew(root, "translations", []string{"en", "fr"})

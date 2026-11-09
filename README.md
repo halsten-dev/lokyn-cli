@@ -3,11 +3,35 @@ Lokyn CLI is a tool to help translate a multilingual project created with the li
 
 ## Discovery
 
-Go source discovery recognizes Lokyn `L`, `P`, `LCtx`, and `PCtx`, including
+Go source discovery recognizes Lokyn `L`, `P`, `LCtx`, `PCtx`, and the `Key`
+marker (a singular key), including
 import aliases and `Localizer.L` / `Localizer.P` methods. It follows forwarded
 key parameters through up to **two wrapper-function levels**, across files and
 local packages. String literals and string constants are resolved automatically.
 Hidden files and folders are skipped; generated Go files and tests are included.
+
+A project whose `.lokyn/lokynproj.json` sets `"LocationPath"` to `""` or `"."`
+resolves to the directory containing `.lokyn`, and keeps that value when saved,
+so the project file can be committed.
+
+## TypeScript discovery
+
+`.ts` and `.tsx` files are scanned for calls to three functions, each taking the
+key as its first argument:
+
+| Function | Key |
+| --- | --- |
+| `t(key, ...)` | singular |
+| `tKey(key)` | singular |
+| `tp(key, count, ...)` | plural |
+
+The key must be a string literal or a template literal without `${`. Any other
+first argument is a dynamic expression to reconcile, identified by its file and
+source text. Member calls such as `obj.t(...)` and declarations such as
+`function t(...)` are ignored, as are comments and the content of strings.
+
+Discovery skips the folders `node_modules`, `dist`, `bin`, and `bindings`, in
+addition to hidden ones, for both Go and TypeScript.
 
 ## Dynamic-key reconciliation
 

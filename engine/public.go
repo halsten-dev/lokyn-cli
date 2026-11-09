@@ -23,7 +23,10 @@ func DiscoverProject(directory string) (Project, error) {
 	if err := discoverProject(&project, root); err != nil {
 		return project, err
 	}
-	if project.LocationPath != root {
+	if filepath.Clean(project.LocationPath) == "." {
+		stored := project.LocationPath
+		project.LocationPath, project.storedLocation = root, &stored
+	} else if project.LocationPath != root {
 		project.LocationPath = root
 		if err := ProjectSave(&project); err != nil {
 			return project, fmt.Errorf("update project location: %w", err)

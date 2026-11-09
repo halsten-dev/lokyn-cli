@@ -19,6 +19,9 @@ import (
 const maxWrapperDepth = 2
 const lokynImportPath = "github.com/halsten-dev/lokyn"
 
+// skippedDirectories hold dependencies and generated code, never translation calls.
+var skippedDirectories = map[string]bool{"node_modules": true, "dist": true, "bin": true, "bindings": true}
+
 type sourcePackage struct {
 	path  string
 	files []*ast.File
@@ -73,8 +76,8 @@ func (s *sourceImporter) Import(path string) (*types.Package, error) {
 	return p, nil
 }
 
-// defineLokynAPI models both the process-wide API and the v1.1 request-local
-// API without requiring the scanned project's dependencies to be installed.
+// defineLokynAPI models the process-wide API, the v1.1 request-local API and
+// the v1.2 Key marker without requiring the scanned project's dependencies to be installed.
 func defineLokynAPI(p *types.Package) {
 	localizer := types.NewNamed(types.NewTypeName(token.NoPos, p, "Localizer", nil), types.NewStruct(nil, nil), nil)
 	p.Scope().Insert(localizer.Obj())
@@ -103,6 +106,7 @@ func defineLokynAPI(p *types.Package) {
 		localizer.AddMethod(function(name, types.NewVar(token.NoPos, p, "lz", pointer), params, str))
 		p.Scope().Insert(function(name+"Ctx", nil, append([]types.Type{context}, params...), str))
 	}
+	p.Scope().Insert(function("Key", nil, []types.Type{str}, str))
 	p.Scope().Insert(function("NewLocalizer", nil, []types.Type{str}, pointer))
 	p.Scope().Insert(function("FromContext", nil, []types.Type{context}, pointer))
 	p.Scope().Insert(function("WithContext", nil, []types.Type{context, pointer}, context))
@@ -114,7 +118,7 @@ func lokynKeyArgument(call sourceCall) (index int, plural bool, ok bool) {
 		return 0, false, false
 	}
 	switch fn.Name() {
-	case "L", "P":
+	case "L", "P", "Key":
 		plural = fn.Name() == "P"
 	case "LCtx", "PCtx":
 		index = 1 // Context precedes the key.
@@ -170,13 +174,24 @@ func discoverDirectory(keys *DiscoveredKeys, vars *DiscoveredVars, directory str
 		if err != nil {
 			return err
 		}
-		if path != root && strings.HasPrefix(entry.Name(), ".") {
+		skipped := strings.HasPrefix(entry.Name(), ".") || entry.IsDir() && skippedDirectories[entry.Name()]
+		if path != root && skipped {
 			if entry.IsDir() {
 				return filepath.SkipDir
 			}
 			return nil
 		}
-		if entry.IsDir() || filepath.Ext(path) != ".go" {
+		switch ext := filepath.Ext(path); {
+		case entry.IsDir():
+			return nil
+		case ext == ".ts" || ext == ".tsx":
+			src, err := os.ReadFile(path)
+			if err != nil {
+				return err
+			}
+			discoverTypeScript(keys, vars, relativeSourcePath(root, path), src)
+			return nil
+		case ext != ".go":
 			return nil
 		}
 		file, err := parser.ParseFile(s.fset, path, nil, 0)
@@ -267,21 +282,13 @@ func discoverDirectory(keys *DiscoveredKeys, vars *DiscoveredVars, directory str
 		var text bytes.Buffer
 		_ = format.Node(&text, s.fset, expr)
 		position := s.fset.Position(expr.Pos())
-		file, _ := filepath.Rel(root, position.Filename)
-		file = filepath.ToSlash(file)
+		file := relativeSourcePath(root, position.Filename)
 		scope := expressionScope(expr, context)
 		id, _ := json.Marshal([]string{file, scope, text.String()})
-		variable := DiscoveredVar{
+		appendDiscoveredVar(vars, DiscoveredVar{
 			Var: Var(id), Expression: text.String(), File: file,
 			Scope: scope, Line: position.Line, IsPlural: plural,
-		}
-		if i := vars.VarIndex(variable.Var); i >= 0 {
-			if (*vars)[i].IsPlural != plural {
-				(*vars)[i].Err = fmt.Errorf("expression is used as both singular and plural")
-			}
-		} else {
-			*vars = append(*vars, variable)
-		}
+		})
 	}
 	for _, call := range direct {
 		index, plural, _ := lokynKeyArgument(call)
@@ -379,4 +386,19 @@ func appendDiscoveredKey(keys *DiscoveredKeys, text string, plural bool, err err
 	} else {
 		*keys = append(*keys, DiscoveredKey{Key: key, IsPlural: plural, Err: err})
 	}
+}
+
+func appendDiscoveredVar(vars *DiscoveredVars, variable DiscoveredVar) {
+	if i := vars.VarIndex(variable.Var); i >= 0 {
+		if (*vars)[i].IsPlural != variable.IsPlural {
+			(*vars)[i].Err = fmt.Errorf("expression is used as both singular and plural")
+		}
+	} else {
+		*vars = append(*vars, variable)
+	}
+}
+
+func relativeSourcePath(root, path string) string {
+	file, _ := filepath.Rel(root, path)
+	return filepath.ToSlash(file)
 }

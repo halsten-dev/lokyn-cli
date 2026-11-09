@@ -100,6 +100,11 @@ type Project struct {
 	VarsKeysLink map[Var]Keys
 	// Ignoring must be explicit; an empty link list is unresolved.
 	VarsIgnored map[Var]bool
+
+	// storedLocation is a relative LocationPath ("" or ".") as read from disk.
+	// It is written back instead of the resolved path so a committed project
+	// file stays valid in every checkout.
+	storedLocation *string
 }
 
 type LangKeyMap map[Lang]map[Key]Translation

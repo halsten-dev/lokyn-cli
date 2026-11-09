@@ -7,7 +7,11 @@ import (
 )
 
 func projectSave(p *Project, filePath string) error {
-	content, err := json.Marshal(*p)
+	stored := *p
+	if p.storedLocation != nil {
+		stored.LocationPath = *p.storedLocation
+	}
+	content, err := json.Marshal(stored)
 
 	if err != nil {
 		return err
