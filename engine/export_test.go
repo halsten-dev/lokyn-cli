@@ -99,3 +99,39 @@ func TestExportAllTranslationsMultipleKeysAndLanguages(t *testing.T) {
 		}
 	}
 }
+
+func TestExportAllTranslationsIsSortedAndStable(t *testing.T) {
+	project := ProjectNew(t.TempDir(), ".", []string{"en"})
+	data := KeyLangMap{}
+	for _, key := range []Key{"Zebra", "apple", "Delete %s?", "%d entries", "Banana", "Ändern"} {
+		data[key] = map[Lang]Translation{"en": {OneValue: string(key), OtherValue: string(key), IsPlural: key == "%d entries"}}
+	}
+	export := func() string {
+		t.Helper()
+		if err := ExportAllTranslations(&project, data); err != nil {
+			t.Fatal(err)
+		}
+		content, err := os.ReadFile(filepath.Join(project.LocationPath, "en.json"))
+		if err != nil {
+			t.Fatal(err)
+		}
+		return string(content)
+	}
+	first := export()
+	for range 5 {
+		if again := export(); again != first {
+			t.Fatalf("export changed between runs:\n%s\nthen:\n%s", first, again)
+		}
+	}
+	want := "{\n" +
+		"\t\"%d entries\": {\n\t\t\"One\": \"%d entries\",\n\t\t\"Other\": \"%d entries\"\n\t},\n" +
+		"\t\"Banana\": \"Banana\",\n" +
+		"\t\"Delete %s?\": \"Delete %s?\",\n" +
+		"\t\"Zebra\": \"Zebra\",\n" +
+		"\t\"apple\": \"apple\",\n" +
+		"\t\"Ändern\": \"Ändern\"\n" +
+		"}\n"
+	if first != want {
+		t.Fatalf("export =\n%s\nwant sorted:\n%s", first, want)
+	}
+}

@@ -5,9 +5,11 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"maps"
 	"os"
 	"path"
 	"path/filepath"
+	"slices"
 )
 
 // This file only contains the public API of the engine package.
@@ -119,7 +121,10 @@ func ExportAllTranslations(project *Project, data KeyLangMap) error {
 
 		count = 0
 
-		for k, t := range exportData[l] {
+		// Sorted keys keep exports stable, so a round-trip makes no unrelated diff.
+		translations := exportData[l]
+		for _, k := range slices.Sorted(maps.Keys(translations)) {
+			t := translations[k]
 			if t.OneValue == "" {
 				continue
 			}

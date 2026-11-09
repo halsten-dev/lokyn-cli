@@ -87,8 +87,14 @@ func (f *typeScriptFile) push(mode scanMode) {
 
 func (f *typeScriptFile) pop() {
 	f.frames = f.frames[:len(f.frames)-1]
+}
+
+// endElement closes the innermost JSX element. Back in code, the whole element
+// was an operand, so a following '/' or '<' is an operator.
+func (f *typeScriptFile) endElement() {
+	f.pop()
 	if mode := f.mode(); mode != jsxTag && mode != jsxChildren {
-		f.prev, f.word = ')', nil // A whole JSX element is an operand.
+		f.prev, f.word = ')', nil
 	}
 }
 
@@ -109,10 +115,7 @@ func (f *typeScriptFile) codeToken(i int) int {
 	}
 	c := src[i]
 	if isIdentifierByte(c) {
-		end := i + 1
-		for end < len(src) && isIdentifierByte(src[end]) {
-			end++
-		}
+		end := identifierEnd(src, i)
 		next := end
 		plural, isKeyFunction := typeScriptKeyFunctions[string(src[i:end])]
 		if isKeyFunction && f.prev != '.' && string(f.word) != "function" {
@@ -126,7 +129,7 @@ func (f *typeScriptFile) codeToken(i int) int {
 	case c == '"' || c == '\'':
 		next = quotedEnd(src, i)
 	case c == '`':
-		return f.templateText(i + 1)
+		return f.enterTemplateText(i + 1)
 	case c == '/' && f.operandExpected():
 		next = regexEnd(src, i)
 	case c == '<' && f.jsx && f.operandExpected() && jsxTagStart(src, i+1):
@@ -139,13 +142,13 @@ func (f *typeScriptFile) codeToken(i int) int {
 			mode := f.frames[top].mode
 			f.pop()
 			if mode == templateCode {
-				return f.templateText(i + 1)
+				return f.enterTemplateText(i + 1)
 			}
 			return i + 1
 		}
 		f.depth--
 	}
-	if c != ' ' && c != '\t' && c != '\n' && c != '\r' {
+	if !isSpace(c) {
 		f.prev, f.word = c, nil
 	}
 	return next
@@ -162,7 +165,7 @@ func (f *typeScriptFile) tag(i int) int {
 		}
 		return len(f.src)
 	case c == '/' && i+1 < len(f.src) && f.src[i+1] == '>':
-		f.pop()
+		f.endElement()
 		return i + 2
 	case c == '>':
 		f.frames[len(f.frames)-1].mode = jsxChildren
@@ -177,7 +180,7 @@ func (f *typeScriptFile) children(i int) int {
 		f.push(jsxCode)
 	case '<':
 		if i+1 < len(f.src) && f.src[i+1] == '/' {
-			f.pop()
+			f.endElement()
 			if end := bytes.IndexByte(f.src[i:], '>'); end >= 0 {
 				return i + end + 1
 			}
@@ -194,25 +197,27 @@ func (f *typeScriptFile) children(i int) int {
 }
 
 // jsxTagStart reports whether a '<' before i opens a JSX element rather than
-// a generic arrow function's type parameters such as <T,> or <T extends U>.
+// a generic arrow function's type parameters: <T,>, <T = U> or <T extends U>.
 func jsxTagStart(src []byte, i int) bool {
-	if i >= len(src) || src[i] == '>' {
-		return i < len(src)
-	}
-	if !isIdentifierByte(src[i]) || '0' <= src[i] && src[i] <= '9' {
+	switch {
+	case i >= len(src):
+		return false
+	case src[i] == '>':
+		return true // A fragment.
+	case !isIdentifierByte(src[i]) || '0' <= src[i] && src[i] <= '9':
 		return false
 	}
-	end := i
-	for end < len(src) && isIdentifierByte(src[end]) {
-		end++
+	next := skipSpace(src, identifierEnd(src, i))
+	if next >= len(src) || src[next] == ',' || src[next] == '=' {
+		return false
 	}
-	next := skipSpace(src, end)
-	return next < len(src) && src[next] != ',' && !bytes.HasPrefix(src[next:], []byte("extends "))
+	word := identifierEnd(src, next)
+	return string(src[next:word]) != "extends" || word >= len(src) || !isSpace(src[word])
 }
 
-// templateText skips template text from i and, if it stops at a
+// enterTemplateText skips template text from i and, if it stops at a
 // substitution, enters its code.
-func (f *typeScriptFile) templateText(i int) int {
+func (f *typeScriptFile) enterTemplateText(i int) int {
 	end, open := templateText(f.src, i)
 	if open {
 		f.push(templateCode)
@@ -357,7 +362,7 @@ func commentEnd(src []byte, i int) (int, bool) {
 }
 
 // quotedEnd returns the index just past the string starting at i. Strings
-// cannot span lines, so an apostrophe in JSX text only hides the rest of its line.
+// cannot span lines, so an unterminated one ends at its line's end.
 func quotedEnd(src []byte, i int) int {
 	quote := src[i]
 	for i++; i < len(src); i++ {
@@ -397,10 +402,21 @@ func regexEnd(src []byte, i int) int {
 }
 
 func skipSpace(src []byte, i int) int {
-	for i < len(src) && (src[i] == ' ' || src[i] == '\t' || src[i] == '\n' || src[i] == '\r') {
+	for i < len(src) && isSpace(src[i]) {
 		i++
 	}
 	return i
+}
+
+func identifierEnd(src []byte, i int) int {
+	for i < len(src) && isIdentifierByte(src[i]) {
+		i++
+	}
+	return i
+}
+
+func isSpace(c byte) bool {
+	return c == ' ' || c == '\t' || c == '\n' || c == '\r'
 }
 
 func isIdentifierByte(c byte) bool {

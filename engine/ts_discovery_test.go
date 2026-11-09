@@ -214,10 +214,15 @@ const map = new Map<string, number>(); t("R8");
 		"generic.tsx": `
 const id = <T,>(value: T) => value; t("G1");
 const pick = <T extends object>(value: T) => value; t("G2");
+const fallback = <T = string>(value: T) => value; t("G5");
+const wrapped = <T extends
+  object>(value: T) => value; t("G6");
+const tabbed = <T extends	object>(value: T) => value; t("G7");
+const pair = <K, V>(key: K, value: V) => [key, value]; t("G8");
 const less = i < n ? t("G3") : <b>{t("G4")}</b>;
 `,
 	}
-	requireOnlyKeys(t, sources, "R1", "R2", "R3", "R4", "R5", "R6", "R7", "R8", "G1", "G2", "G3", "G4")
+	requireOnlyKeys(t, sources, "R1", "R2", "R3", "R4", "R5", "R6", "R7", "R8", "G1", "G2", "G3", "G4", "G5", "G6", "G7", "G8")
 }
 
 func TestTSXRealWorldShapes(t *testing.T) {
